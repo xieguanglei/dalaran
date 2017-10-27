@@ -6,15 +6,16 @@ const webpackStream = require('webpack-stream');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const path = require('path');
 const { exec } = require('child_process');
-const fs = require('fs');
+const fs = require('fs-extra');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-const getWebpackConfig = function ({ entry, base, babelOptions }) {
+const getWebpackConfig = function ({ entrys, base, demo, babelOptions }) {
+
+    const entry = {};
+    entrys.forEach(file => entry[file] = ['babel-polyfill', demo + '/' + file + '.js']);
 
     var config = {
-        entry: {
-            index: ['babel-polyfill', entry]
-        },
+        entry,
         output: {
             path: path.join(base, 'build'),
             filename: '[name].bundle.js',
@@ -69,13 +70,29 @@ const libraryTasks = function (
         src = './src',
         lib = './lib',
         demo = './demo',
-        dist = './dist'
+        dist = './dist',
+        umdName = 'foo'
     } = {}
 ) {
+
+    const filesInDemo = fs.readdirSync(demo);
+    const demoEntryList = filesInDemo.map(file => {
+        if (path.extname(file) === '.js') {
+            const baseName = path.basename(file, '.js');
+            const htmlFileName = path.basename(file, '.js') + '.html';
+            if (filesInDemo.indexOf(htmlFileName) !== -1) {
+                return baseName;
+            }
+        }
+        return null;
+    }).filter(Boolean);
+
+
     const dev = function (cb) {
         const config = getWebpackConfig({
-            entry: demo + '/index.js',
+            entrys: demoEntryList,
             base,
+            demo,
             babelOptions: getBabelOptions()
         });
         const app = express();
@@ -88,14 +105,28 @@ const libraryTasks = function (
             gUtil.log('[webpack-dev-server]', `started at port ${port}`);
         });
     }
+
     const build = function () {
         return gulp.src(entry)
             .pipe(webpackStream(getWebpackConfig({
-                entry, base,
+                entrys: demoEntryList,
+                demo,
+                base,
                 babelOptions: getBabelOptions()
             })))
             .pipe(gulp.dest(dist));
     }
+
+    const umd = function () {
+        return gulp.src(entry)
+            .pipe(webpackStream(getWebpackConfig({
+                entry,
+                base,
+                babelOptions: getBabelOptions()
+            })))
+            .pipe(gulp.dest(dist));
+    }
+
     return {
         dev, build
     }

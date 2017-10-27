@@ -1,5 +1,8 @@
 {
     "devDependencies": {
         "gulp": "^3.9.1"
+    },
+    "dependencies": {
+        "lodash": "^4.17.4"
     }
 }

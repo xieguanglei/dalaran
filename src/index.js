@@ -9,18 +9,31 @@ const { exec } = require('child_process');
 const fs = require('fs-extra');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-const getWebpackConfig = function ({ entrys, base, demo, babelOptions }) {
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName }) {
 
-    const entry = {};
-    entrys.forEach(file => entry[file] = ['babel-polyfill', demo + '/' + file + '.js']);
+    const entryConfig = {};
+    const outputConfig = {
+        path: path.join(base, dist),
+        publicPath: '/'
+    };
+    const plugins = [];
+
+    if (entrys && demo) {
+        entrys.forEach(file => entryConfig[file] = ['babel-polyfill', demo + '/' + file + '.js']);
+        outputConfig.filename = '[name].dev.js';
+    } else if (entry && umdName) {
+        entryConfig[umdName.toLowerCase()] = ['babel-polyfill', entry];
+        outputConfig.library = umdName;
+        outputConfig.libraryTarget = 'umd';
+        outputConfig.filename = '[name].min.js';
+        plugins.push(new UglifyJSPlugin());
+    } else {
+        throw 'get webpack config input not valid';
+    }
 
     var config = {
-        entry,
-        output: {
-            path: path.join(base, 'build'),
-            filename: '[name].bundle.js',
-            publicPath: '/'
-        },
+        entry: entryConfig,
+        output: outputConfig,
         module: {
             loaders: [
                 {
@@ -33,13 +46,8 @@ const getWebpackConfig = function ({ entrys, base, demo, babelOptions }) {
                 }
             ]
         },
-        plugins: [
-        ]
+        plugins
     }
-
-    // if (!isDev) {
-    //     config.plugins.push(new UglifyJSPlugin());
-    // }
 
     return config;
 };
@@ -48,7 +56,7 @@ const getWebpackConfig = function ({ entrys, base, demo, babelOptions }) {
 
 
 const getBabelOptions = function () {
-    return {
+    const res = {
         "presets": [
             "env",
             "stage-0"
@@ -57,9 +65,12 @@ const getBabelOptions = function () {
             "transform-class-properties",
             "transform-object-rest-spread",
             "transform-react-jsx",
-            "transform-decorators-legacy"
+            "transform-decorators-legacy",
+            "add-module-exports"
         ]
     }
+
+    return res;
 }
 
 const libraryTasks = function (
@@ -93,20 +104,21 @@ const libraryTasks = function (
             entrys: demoEntryList,
             base,
             demo,
+            dist,
             babelOptions: getBabelOptions()
         });
         const app = express();
         const compiler = webpack(config);
+        app.use(express.static(demo));        
         app.use(webpackDevMiddleware(compiler, {
             publicPath: config.output.publicPath
         }));
-        app.use(express.static(demo));
         app.listen(3000, function () {
             gUtil.log('[webpack-dev-server]', `started at port ${port}`);
         });
     }
 
-    const build = function () {
+    const buildDemo = function () {
         return gulp.src(entry)
             .pipe(webpackStream(getWebpackConfig({
                 entrys: demoEntryList,
@@ -117,11 +129,14 @@ const libraryTasks = function (
             .pipe(gulp.dest(dist));
     }
 
-    const umd = function () {
+    const build = function () {
+        fs.emptyDirSync(dist);
         return gulp.src(entry)
             .pipe(webpackStream(getWebpackConfig({
                 entry,
                 base,
+                umdName,
+                dist,
                 babelOptions: getBabelOptions()
             })))
             .pipe(gulp.dest(dist));

@@ -9,7 +9,7 @@ const { exec } = require('child_process');
 const fs = require('fs-extra');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName }) {
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -20,15 +20,18 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
 
     if (entrys && demo) {
         entrys.forEach(file => entryConfig[file] = ['babel-polyfill', demo + '/' + file + '.js']);
-        outputConfig.filename = '[name].dev.js';
+        outputConfig.filename = `[name].${suffix}.js`;
     } else if (entry && umdName) {
         entryConfig[umdName.toLowerCase()] = ['babel-polyfill', entry];
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
-        outputConfig.filename = '[name].min.js';
-        plugins.push(new UglifyJSPlugin());
+        outputConfig.filename = `[name].${suffix}.js`;
     } else {
         throw 'get webpack config input not valid';
+    }
+
+    if(minify){
+        plugins.push(new UglifyJSPlugin());        
     }
 
     var config = {
@@ -52,9 +55,6 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
     return config;
 };
 
-
-
-
 const getBabelOptions = function () {
     const res = {
         "presets": [
@@ -73,20 +73,8 @@ const getBabelOptions = function () {
     return res;
 }
 
-const libraryTasks = function (
-    {
-        port = 3000,
-        base = process.cwd(),
-        entry = './src/index.js',
-        src = './src',
-        lib = './lib',
-        demo = './demo',
-        dist = './dist',
-        umdName = 'foo'
-    } = {}
-) {
-
-    const filesInDemo = fs.readdirSync(demo);
+const getDemoEntries = function (dir) {
+    const filesInDemo = fs.readdirSync(dir);
     const demoEntryList = filesInDemo.map(file => {
         if (path.extname(file) === '.js') {
             const baseName = path.basename(file, '.js');
@@ -98,36 +86,54 @@ const libraryTasks = function (
         return null;
     }).filter(Boolean);
 
+    return demoEntryList;
+}
 
+const getDevTask = function ({ webpackConfig, demo, port }) {
     const dev = function (cb) {
-        const config = getWebpackConfig({
+        const config = webpackConfig;
+        const app = express();
+        const compiler = webpack(config);
+        app.use(express.static(demo));
+        app.use(webpackDevMiddleware(compiler, {
+            publicPath: config.output.publicPath
+        }));
+        app.listen(port, function () {
+            gUtil.log('[webpack-dev-server]', `started at port ${port}`);
+        });
+    }
+    return dev;
+}
+
+const libraryTasks = function (
+    {
+        port = 3000,
+        base = process.cwd(),
+        entry = './src/index.js',
+        src = './src',
+        lib = './lib',
+        demo = './demo',
+        dist = './dist',
+        umdName = 'foo',
+        devSuffix = 'bundle',
+        buildSuffix = 'min'
+    } = {}
+) {
+
+    const demoEntryList = getDemoEntries(demo);
+
+    const dev = getDevTask({
+        webpackConfig: getWebpackConfig({
             entrys: demoEntryList,
             base,
             demo,
             dist,
+            suffix: devSuffix,
             babelOptions: getBabelOptions()
-        });
-        const app = express();
-        const compiler = webpack(config);
-        app.use(express.static(demo));        
-        app.use(webpackDevMiddleware(compiler, {
-            publicPath: config.output.publicPath
-        }));
-        app.listen(3000, function () {
-            gUtil.log('[webpack-dev-server]', `started at port ${port}`);
-        });
-    }
-
-    const buildDemo = function () {
-        return gulp.src(entry)
-            .pipe(webpackStream(getWebpackConfig({
-                entrys: demoEntryList,
-                demo,
-                base,
-                babelOptions: getBabelOptions()
-            })))
-            .pipe(gulp.dest(dist));
-    }
+        }),
+        demo,
+        port
+    });
 
     const build = function () {
         fs.emptyDirSync(dist);
@@ -137,7 +143,9 @@ const libraryTasks = function (
                 base,
                 umdName,
                 dist,
-                babelOptions: getBabelOptions()
+                suffix: buildSuffix,
+                babelOptions: getBabelOptions(),
+                minify: true
             })))
             .pipe(gulp.dest(dist));
     }
@@ -148,4 +156,51 @@ const libraryTasks = function (
 }
 
 
-module.exports = { libraryTasks };
+const applicationTasks = function (
+    {
+        port = 3000,
+        base = process.cwd(),
+        entry = './src/index.js',
+        src = './src',
+        lib = './lib',
+        demo = './demo',
+        dist = './dist',
+        devSuffix = 'bundle',
+        buildSuffix = 'bundle'
+    } = {}
+) {
+    const demoEntryList = getDemoEntries(demo);
+
+    const dev = getDevTask({
+        webpackConfig: getWebpackConfig({
+            entrys: demoEntryList,
+            base,
+            demo,
+            dist,
+            suffix: devSuffix,
+            babelOptions: getBabelOptions()
+        }),
+        demo,
+        port
+    });
+
+    const build = function () {
+        fs.emptyDirSync(dist);        
+        return gulp.src(entry)
+            .pipe(webpackStream(getWebpackConfig({
+                entrys: demoEntryList,
+                demo,
+                base,
+                dist,
+                suffix: buildSuffix,
+                babelOptions: getBabelOptions(),
+                minify: true
+            })))
+            .pipe(gulp.dest(dist));
+    }
+
+    return {dev, build};
+}
+
+
+module.exports = { libraryTasks, applicationTasks };

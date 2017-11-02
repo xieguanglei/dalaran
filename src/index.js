@@ -8,8 +8,10 @@ const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs-extra');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
+const babel = require('babel-core');
+const glob = require('glob');
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify }) {
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -17,11 +19,23 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         publicPath: '/'
     };
     const plugins = [];
+    const loaders = [
+        {
+            test: /\.js$/,
+            exclude: /(node_modules)/,
+            use: {
+                loader: 'babel-loader',
+                options: babelOptions
+            }
+        }
+    ]
 
     if (entrys && demo) {
+        // application
         entrys.forEach(file => entryConfig[file] = ['babel-polyfill', demo + '/' + file + '.js']);
         outputConfig.filename = `[name].${suffix}.js`;
     } else if (entry && umdName) {
+        // libaray
         entryConfig[umdName.toLowerCase()] = ['babel-polyfill', entry];
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
@@ -30,24 +44,27 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         throw 'get webpack config input not valid';
     }
 
-    if(minify){
-        plugins.push(new UglifyJSPlugin());        
+    if (react) {
+        loaders.push({
+            test: /\.less$/,
+            exclude: /(node_modules)/,
+            use: [
+                'style-loader',
+                'css-loader',
+                'less-loader'
+            ]
+        })
+    }
+
+    if (minify) {
+        plugins.push(new UglifyJSPlugin());
     }
 
     var config = {
         entry: entryConfig,
         output: outputConfig,
         module: {
-            loaders: [
-                {
-                    test: /\.js$/,
-                    exclude: /(node_modules)/,
-                    use: {
-                        loader: 'babel-loader',
-                        options: babelOptions
-                    }
-                }
-            ]
+            loaders,
         },
         plugins
     }
@@ -55,7 +72,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
     return config;
 };
 
-const getBabelOptions = function () {
+const getBabelOptions = function ({ react }) {
     const res = {
         "presets": [
             "env",
@@ -64,10 +81,14 @@ const getBabelOptions = function () {
         "plugins": [
             "transform-class-properties",
             "transform-object-rest-spread",
-            "transform-react-jsx",
             "transform-decorators-legacy",
             "add-module-exports"
         ]
+    };
+    if (react) {
+        res.plugins.push(
+            "transform-react-jsx"
+        )
     }
 
     return res;
@@ -116,11 +137,13 @@ const libraryTasks = function (
         dist = './dist',
         umdName = 'foo',
         devSuffix = 'bundle',
-        buildSuffix = 'min'
+        buildSuffix = 'min',
+        react = false
     } = {}
 ) {
 
     const demoEntryList = getDemoEntries(demo);
+    const babelOptions = getBabelOptions({ react });
 
     const dev = getDevTask({
         webpackConfig: getWebpackConfig({
@@ -129,10 +152,11 @@ const libraryTasks = function (
             demo,
             dist,
             suffix: devSuffix,
-            babelOptions: getBabelOptions()
+            babelOptions
         }),
         demo,
-        port
+        port,
+        react
     });
 
     const build = function () {
@@ -144,14 +168,25 @@ const libraryTasks = function (
                 umdName,
                 dist,
                 suffix: buildSuffix,
-                babelOptions: getBabelOptions(),
-                minify: true
+                babelOptions,
+                minify: true,
+                react
             })))
             .pipe(gulp.dest(dist));
     }
 
+    const compile = function () {
+        fs.emptyDirSync(lib);
+        const files = glob.sync(src + '/**/*.js');
+        files.forEach(function (file) {
+            const res = babel.transformFileSync(file, babelOptions);
+            const target = file.replace(src, lib);
+            fs.outputFileSync(target, res.code, 'utf-8');
+        });
+    }
+
     return {
-        dev, build
+        dev, build, compile
     }
 }
 
@@ -166,10 +201,12 @@ const applicationTasks = function (
         demo = './demo',
         dist = './dist',
         devSuffix = 'bundle',
-        buildSuffix = 'bundle'
+        buildSuffix = 'bundle',
+        react = false
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
+    const babelOptions = getBabelOptions({ react });
 
     const dev = getDevTask({
         webpackConfig: getWebpackConfig({
@@ -178,28 +215,33 @@ const applicationTasks = function (
             demo,
             dist,
             suffix: devSuffix,
-            babelOptions: getBabelOptions()
+            babelOptions,
+            react
         }),
         demo,
         port
     });
 
     const build = function () {
-        fs.emptyDirSync(dist);        
-        return gulp.src(entry)
+        fs.emptyDirSync(dist);
+        const taskBuild = gulp.src(entry)
             .pipe(webpackStream(getWebpackConfig({
                 entrys: demoEntryList,
                 demo,
                 base,
                 dist,
                 suffix: buildSuffix,
-                babelOptions: getBabelOptions(),
-                minify: true
+                babelOptions,
+                minify: true,
+                react
             })))
             .pipe(gulp.dest(dist));
+        const taskHtml = gulp.src(demo + '/*.html')
+            .pipe(gulp.dest(dist));
+        return [taskBuild, taskHtml];
     }
 
-    return {dev, build};
+    return { dev, build };
 }
 
 

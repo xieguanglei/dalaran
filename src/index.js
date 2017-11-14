@@ -11,7 +11,7 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const babel = require('babel-core');
 const glob = require('glob');
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react }) {
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react, loaders: extraLoaders }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -27,7 +27,8 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
                 loader: 'babel-loader',
                 options: babelOptions
             }
-        }
+        },
+        ...extraLoaders
     ]
 
     if (entrys && demo) {
@@ -138,7 +139,8 @@ const libraryTasks = function (
         umdName = 'foo',
         devSuffix = 'bundle',
         buildSuffix = 'min',
-        react = false
+        react = false,
+        loaders = []
     } = {}
 ) {
 
@@ -152,7 +154,8 @@ const libraryTasks = function (
             demo,
             dist,
             suffix: devSuffix,
-            babelOptions
+            babelOptions,
+            loaders
         }),
         demo,
         port,
@@ -170,7 +173,8 @@ const libraryTasks = function (
                 suffix: buildSuffix,
                 babelOptions,
                 minify: true,
-                react
+                react,
+                loaders
             })))
             .pipe(gulp.dest(dist));
     }
@@ -202,7 +206,8 @@ const applicationTasks = function (
         dist = './dist',
         devSuffix = 'bundle',
         buildSuffix = 'bundle',
-        react = false
+        react = false,
+        loaders = []
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -216,7 +221,8 @@ const applicationTasks = function (
             dist,
             suffix: devSuffix,
             babelOptions,
-            react
+            react,
+            loaders
         }),
         demo,
         port
@@ -233,7 +239,8 @@ const applicationTasks = function (
                 suffix: buildSuffix,
                 babelOptions,
                 minify: true,
-                react
+                react,
+                loaders
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')

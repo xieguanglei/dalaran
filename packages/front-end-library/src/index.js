@@ -1,3 +1,8 @@
+import txt from './text.txt';
+
+console.log(txt);
+
+
 function sleepAble(Clazz) {
     class SleepSome extends Clazz {
         async sleep(t) {

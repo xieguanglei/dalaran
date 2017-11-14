@@ -3,7 +3,11 @@ const opack = require( '../../src/index');
 
 
 const lTasks = opack.libraryTasks({
-    umdName: 'Caculator'
+    umdName: 'Caculator',
+    loaders: [{
+        test: /\.txt$/,
+        use: 'raw-loader'
+    }]
 });
 
 

@@ -2,6 +2,9 @@ import txt from './text.txt';
 
 console.log(txt);
 
+console.log(bar);
+console.log(bar_two);
+
 
 function sleepAble(Clazz) {
     class SleepSome extends Clazz {

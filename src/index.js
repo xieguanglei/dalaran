@@ -11,14 +11,17 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const babel = require('babel-core');
 const glob = require('glob');
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react, loaders: extraLoaders }) {
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react, 
+    loaders: extraLoaders, plugins: extraPlugins }) {
 
     const entryConfig = {};
     const outputConfig = {
         path: path.join(base, dist),
         publicPath: '/'
     };
-    const plugins = [];
+    const plugins = [
+        ...extraPlugins
+    ];
     const loaders = [
         {
             test: /\.js$/,
@@ -140,7 +143,8 @@ const libraryTasks = function (
         devSuffix = 'bundle',
         buildSuffix = 'min',
         react = false,
-        loaders = []
+        loaders = [],
+        plugins = []
     } = {}
 ) {
 
@@ -155,7 +159,8 @@ const libraryTasks = function (
             dist,
             suffix: devSuffix,
             babelOptions,
-            loaders
+            loaders,
+            plugins
         }),
         demo,
         port,
@@ -174,7 +179,8 @@ const libraryTasks = function (
                 babelOptions,
                 minify: true,
                 react,
-                loaders
+                loaders,
+                plugins
             })))
             .pipe(gulp.dest(dist));
     }
@@ -207,7 +213,8 @@ const applicationTasks = function (
         devSuffix = 'bundle',
         buildSuffix = 'bundle',
         react = false,
-        loaders = []
+        loaders = [], 
+        plugins = []
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -222,7 +229,8 @@ const applicationTasks = function (
             suffix: devSuffix,
             babelOptions,
             react,
-            loaders
+            loaders,
+            plugins
         }),
         demo,
         port
@@ -240,7 +248,8 @@ const applicationTasks = function (
                 babelOptions,
                 minify: true,
                 react,
-                loaders
+                loaders,
+                plugins
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')

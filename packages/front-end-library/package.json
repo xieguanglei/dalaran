@@ -1,8 +1,10 @@
 {
-    "devDependencies": {
-        "gulp": "^3.9.1"
-    },
-    "dependencies": {
-        "lodash": "^4.17.4"
-    }
+  "devDependencies": {
+    "glob": "^7.1.2",
+    "gulp": "^3.9.1",
+    "webpack": "^3.8.1"
+  },
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
 }

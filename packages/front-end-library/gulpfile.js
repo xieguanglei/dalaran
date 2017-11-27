@@ -20,7 +20,8 @@ const lTasks = opack.libraryTasks({
     }],
     plugins: [
         new webpack.ProvidePlugin(opt)
-    ]
+    ],
+    babelPolyfill: true
 });
 
 
@@ -29,7 +30,3 @@ gulp.task('build', lTasks.build);
 gulp.task('dev', lTasks.dev);
 
 gulp.task('compile', lTasks.compile);
-
-gulp.task('a', function () {
-
-})

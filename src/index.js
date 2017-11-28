@@ -10,6 +10,7 @@ const fs = require('fs-extra');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const babel = require('babel-core');
 const glob = require('glob');
+const cors = require('cors');
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
     loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill }) {
@@ -121,11 +122,14 @@ const getDemoEntries = function (dir) {
     return demoEntryList;
 }
 
-const getDevTask = function ({ webpackConfig, demo, port }) {
+const getDevTask = function ({ webpackConfig, demo, port, devCors }) {
     const dev = function (cb) {
         const config = webpackConfig;
         const app = express();
         const compiler = webpack(config);
+        if(devCors){
+            app.use(cors());            
+        }
         app.use(express.static(demo));
         app.use(webpackDevMiddleware(compiler, {
             publicPath: config.output.publicPath
@@ -152,7 +156,8 @@ const libraryTasks = function (
         react = false,
         loaders = [],
         plugins = [],
-        babelPolyfill = false
+        babelPolyfill = false,
+        devCors = true,
     } = {}
 ) {
 
@@ -169,7 +174,8 @@ const libraryTasks = function (
             babelOptions,
             loaders,
             plugins,
-            babelPolyfill
+            babelPolyfill,
+            devCors
         }),
         demo,
         port,
@@ -225,7 +231,8 @@ const applicationTasks = function (
         react = false,
         loaders = [],
         plugins = [],
-        babelPolyfill = false
+        babelPolyfill = false,
+        devCors = true
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -245,7 +252,8 @@ const applicationTasks = function (
             babelPolyfill
         }),
         demo,
-        port
+        port,
+        devCors
     });
 
     const build = function () {

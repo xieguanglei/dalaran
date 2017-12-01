@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "expect": "^21.2.1",
     "glob": "^7.1.2",
     "gulp": "^3.9.1",
     "webpack": "^3.8.1"

@@ -30,3 +30,5 @@ gulp.task('build', lTasks.build);
 gulp.task('dev', lTasks.dev);
 
 gulp.task('compile', lTasks.compile);
+
+gulp.task('test', lTasks.test);

@@ -11,6 +11,8 @@ const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const babel = require('babel-core');
 const glob = require('glob');
 const cors = require('cors');
+const KarmaServer = require('karma').Server;
+
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
     loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill }) {
@@ -52,6 +54,8 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
         outputConfig.filename = `[name].${suffix}.js`;
+    } else if (!entry && !entrys) {
+        // is generating karma webpack config
     } else {
         throw 'get webpack config input not valid';
     }
@@ -127,8 +131,8 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors }) {
         const config = webpackConfig;
         const app = express();
         const compiler = webpack(config);
-        if(devCors){
-            app.use(cors());            
+        if (devCors) {
+            app.use(cors());
         }
         app.use(express.static(demo));
         app.use(webpackDevMiddleware(compiler, {
@@ -211,8 +215,29 @@ const libraryTasks = function (
         });
     }
 
+    const test = function (done) {
+        new KarmaServer({
+            configFile: path.join(__dirname, '../space/karma.conf.js'),
+            singleRun: true,
+            webpack: getWebpackConfig({
+                entry,
+                base,
+                umdName,
+                dist,
+                suffix: buildSuffix,
+                babelOptions,
+                react,
+                loaders,
+                plugins,
+                babelPolyfill
+            }),
+            webpackMiddleware: {},
+            singleRun: false
+        }, done).start();
+    }
+
     return {
-        dev, build, compile
+        dev, build, compile, test
     }
 }
 

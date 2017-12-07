@@ -9,13 +9,11 @@ module.exports = function (config) {
         require('karma-webpack')
       ],
       frameworks: ['mocha'],
-      files: [
-        path.resolve(process.cwd(), 'src/**/*.spec.js')
-      ],
+      files: [path.resolve(process.cwd(), config.testEntryPattern)],
       exclude: [
       ],
       preprocessors: {
-        [path.resolve(process.cwd(), 'src/**/*.spec.js')]: ['webpack'],
+        [path.resolve(process.cwd(), config.testEntryPattern)]: ['webpack'],
       },
       webpack: config.webpack,
       webpackMiddleware: config.webpackMiddleware,

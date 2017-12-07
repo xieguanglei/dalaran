@@ -162,6 +162,8 @@ const libraryTasks = function (
         plugins = [],
         babelPolyfill = false,
         devCors = true,
+        watchTest = false,
+        testEntryPattern = 'src/**/*.spec.js'
     } = {}
 ) {
 
@@ -218,7 +220,8 @@ const libraryTasks = function (
     const test = function (done) {
         new KarmaServer({
             configFile: path.join(__dirname, '../space/karma.conf.js'),
-            singleRun: true,
+            testEntryPattern,
+            singleRun: watchTest ? false : true,
             webpack: getWebpackConfig({
                 entry,
                 base,
@@ -231,8 +234,7 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill
             }),
-            webpackMiddleware: {},
-            singleRun: false
+            webpackMiddleware: {}
         }, done).start();
     }
 
@@ -257,7 +259,9 @@ const applicationTasks = function (
         loaders = [],
         plugins = [],
         babelPolyfill = false,
-        devCors = true
+        devCors = true,
+        watchTest = false,        
+        testEntryPattern = 'src/**/*.spec.js'
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -303,7 +307,28 @@ const applicationTasks = function (
         return [taskBuild, taskHtml];
     }
 
-    return { dev, build };
+    const test = function (done) {
+        new KarmaServer({
+            configFile: path.join(__dirname, '../space/karma.conf.js'),
+            testEntryPattern,
+            singleRun: watchTest ? false : true,
+            webpack: getWebpackConfig({
+                entry,
+                base,
+                umdName,
+                dist,
+                suffix: buildSuffix,
+                babelOptions,
+                react,
+                loaders,
+                plugins,
+                babelPolyfill
+            }),
+            webpackMiddleware: {}
+        }, done).start();
+    }
+
+    return { dev, build, test };
 }
 
 

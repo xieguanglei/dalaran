@@ -180,12 +180,12 @@ const libraryTasks = function (
             babelOptions,
             loaders,
             plugins,
-            babelPolyfill,
-            devCors
+            babelPolyfill
         }),
         demo,
         port,
-        react
+        react,
+        devCors        
     });
 
     const build = function () {

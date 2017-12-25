@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Demo List</title>
+</head>
+
+<body>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #root {
+            max-width: 960px;
+            margin: auto;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+        }
+        .item{
+            display: flex;
+            border-bottom: 1px solid #ccc;
+        }
+        .name{
+            order: 1;
+            width: 150px;
+            text-align: center;
+        }
+        .link{
+            order: 2;
+            width: 80px;
+            text-align: center;            
+        }
+    </style>
+
+    <div id="root">
+        <div>
+            {{#demos}}
+            <div class="item">
+                <div class="name">{{name}}</div>
+                <div class="link">
+                    <a href="./{{name}}.html">link</a>
+                </div>
+            </div>
+            {{/demos}}
+        </div>
+    </div>
+
+
+
+
+</body>
+
+</html>

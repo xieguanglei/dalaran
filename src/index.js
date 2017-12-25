@@ -12,6 +12,8 @@ const babel = require('babel-core');
 const glob = require('glob');
 const cors = require('cors');
 const KarmaServer = require('karma').Server;
+const open = require('open');
+const Handlebars = require('handlebars');
 
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
@@ -126,8 +128,13 @@ const getDemoEntries = function (dir) {
     return demoEntryList;
 }
 
-const getDevTask = function ({ webpackConfig, demo, port, devCors }) {
+const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList }) {
+
     const dev = function (cb) {
+
+        // const templateStr = fs.readFileSync(path.join(__dirname, '../space/demo-list.handlebars'), 'utf-8');
+        // const template = Handlebars.compile(templateStr);
+
         const config = webpackConfig;
         const app = express();
         const compiler = webpack(config);
@@ -138,9 +145,23 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors }) {
         app.use(webpackDevMiddleware(compiler, {
             publicPath: config.output.publicPath
         }));
+        app.get('/', function (req, res) {
+            const templateStr = fs.readFileSync(path.join(__dirname, '../space/demo-list.handlebars'), 'utf-8');
+            const template = Handlebars.compile(templateStr);
+
+            const data = {
+                demos: demoEntryList.map(item=>{
+                    return {name: item}
+                })
+            }
+            res.send(template(data));
+        });
+
         app.listen(port, function () {
             gUtil.log('[webpack-dev-server]', `started at port ${port}`);
         });
+
+        open(`http://127.0.0.1:${port}/`);
     }
     return dev;
 }
@@ -185,7 +206,8 @@ const libraryTasks = function (
         demo,
         port,
         react,
-        devCors        
+        devCors,
+        demoEntryList
     });
 
     const build = function () {
@@ -234,7 +256,9 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill
             }),
-            webpackMiddleware: {}
+            webpackMiddleware: {
+                quiet: true
+            }
         }, done).start();
     }
 
@@ -260,7 +284,7 @@ const applicationTasks = function (
         plugins = [],
         babelPolyfill = false,
         devCors = true,
-        watchTest = false,        
+        watchTest = false,
         testEntryPattern = 'src/**/*.spec.js'
     } = {}
 ) {

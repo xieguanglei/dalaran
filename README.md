@@ -71,7 +71,7 @@ project
 │   README.md
 │   package.json
 │   gulpfile.js
-└───demos
+└───demo
 │       foo.html
 │       foo.js
 │       bar.html
@@ -107,7 +107,7 @@ You need to put demo pages in the **demo** directory, which by default is './dem
     <title>Document</title>
 </head>
 <body>
-    <script src="/foo.bundle.js"></script>
+    <script src="./foo.bundle.js"></script>
 </body>
 </html>
 ```
@@ -174,7 +174,74 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 
 ### options
 
-// TODO
+| name             | description                                                 | type    | default            |
+| ---------------- | ----------------------------------------------------------- | ------- | ------------------ |
+| port             | dev server port                                             | Number  | 3000               |
+| base             | base directory of the project                               | Sting   | process.cwd()      |
+| src              | the source code directory                                   | String  | './src'            |
+| demo             | the demo pages directory (for development or present)       | String  | './demo'           |
+| dist             | the build file directory (for umd files)                    | String  | './dist'           |
+| devSuffix        | the bundle file's suffix for development enviroment         | String  | 'bundle'           |
+| buildSuffix      | the bundle file's suffix for build target                   | String  | 'bundle'           |
+| react            | whether to transform JSX                                    | Boolean | false              |
+| loaders          | extra webpack loaders                                       | Array   | []                 |
+| plugins          | extra webpack plugins                                       | Array   | []                 |
+| babelPolyfill    | whether to import babelPolyfill                             | Boolean | false              |
+| devCors          | whether to enable CORS on dev server                        | Boolean | true               |
+| watchTest        | whether to use watch mode for test task                     | Boolean | false              |
+| testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
+
+Compared with libaray task options, there are 4 differences:
+
+1. You don't need to provide entry option.
+2. You don't need to provide umdName option.
+3. You don't need to provide lib option.
+4. Default option of buildSuffix is `bundle` but not `min`.
+
+### directory structure
+
+The main project's directory structure may looks like:
+
+```
+project
+│   README.md
+│   package.json
+│   gulpfile.js
+└───demo
+│       foo.html
+│       foo.js
+│       bar.html
+│       bar.js
+└───dist
+│       foo.html
+│       foo.bundle.js
+│       bar.html
+│       bar.bundle.js
+└───src
+    │   index.js
+    └───foo
+            foo.js
+            foo.spec.js
+```
+
+Compared with library tasks, there are 2 main differences. 
+
+1. lib directory is not necessary anymore.
+2. dist directory is a map to demo directory (for library tasks there's only 1 file `${umdName}.${buildSuffix}.js`).
+
+### dev task
+
+Dev task is exactly the same with library tasks.
+
+### test task
+
+Test task is exactly the same with library tasks.
+
+### build task
+
+Unlike library tasks, the build task for application will pack up every page (the demo) into dist directory. It will also copy html files from demo directory to dist directory. You can deploy the js files on server, and load the js on your own page. You can also deploy the whole dist directory to some static server (gh-pages, eg), it works too.
+
+> Notice that there's no `compile` task for application.
 
 ## If you are still confused
 

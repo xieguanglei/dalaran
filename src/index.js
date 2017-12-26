@@ -275,9 +275,7 @@ const applicationTasks = function (
     {
         port = 3000,
         base = process.cwd(),
-        entry = './src/index.js',
         src = './src',
-        lib = './lib',
         demo = './demo',
         dist = './dist',
         devSuffix = 'bundle',
@@ -341,7 +339,7 @@ const applicationTasks = function (
             testEntryPattern,
             singleRun: watchTest ? false : true,
             webpack: getWebpackConfig({
-                entry,
+                entry: demoEntryList,
                 base,
                 umdName,
                 dist,

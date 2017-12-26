@@ -141,10 +141,7 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList
         if (devCors) {
             app.use(cors());
         }
-        app.use(express.static(demo));
-        app.use(webpackDevMiddleware(compiler, {
-            publicPath: config.output.publicPath
-        }));
+
         app.get('/', function (req, res) {
             const templateStr = fs.readFileSync(path.join(__dirname, '../space/demo-list.handlebars'), 'utf-8');
             const template = Handlebars.compile(templateStr);
@@ -156,6 +153,12 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList
             }
             res.send(template(data));
         });
+
+        app.use(express.static(demo));
+        app.use(webpackDevMiddleware(compiler, {
+            publicPath: config.output.publicPath
+        }));
+        
 
         app.listen(port, function () {
             gUtil.log('[webpack-dev-server]', `started at port ${port}`);
@@ -306,12 +309,13 @@ const applicationTasks = function (
         }),
         demo,
         port,
-        devCors
+        devCors,
+        demoEntryList
     });
 
     const build = function () {
         fs.emptyDirSync(dist);
-        const taskBuild = gulp.src(entry)
+        const taskBuild = gulp.src(demoEntryList)
             .pipe(webpackStream(getWebpackConfig({
                 entrys: demoEntryList,
                 demo,

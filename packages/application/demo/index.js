@@ -1,1 +1,3 @@
-console.log('hello demo');
+console.log('hello index');
+
+document.write('index');

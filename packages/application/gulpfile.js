@@ -1,9 +1,7 @@
 const gulp = require('gulp');
-const opack = require( '../../src/index');
+const tasks = require( '../../src/index');
 
+const appTasks = tasks.applicationTasks({});
 
-const aTasks = opack.applicationTasks({});
-
-
-gulp.task('build', aTasks.build);
-gulp.task('dev', aTasks.dev);
+gulp.task('dev', appTasks.dev);
+gulp.task('build', appTasks.build);

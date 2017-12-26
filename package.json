@@ -1,11 +1,12 @@
 {
   "name": "gulp-webpack-tasks-ootb",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": "xieguanglei/gulp-webpack-tasks-ootb",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",

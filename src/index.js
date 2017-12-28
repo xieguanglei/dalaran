@@ -1,5 +1,5 @@
 const gulp = require('gulp');
-const gUtil = require('gulp-util');
+const log = require('fancy-log');
 const express = require('express');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
@@ -147,8 +147,8 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList
             const template = Handlebars.compile(templateStr);
 
             const data = {
-                demos: demoEntryList.map(item=>{
-                    return {name: item}
+                demos: demoEntryList.map(item => {
+                    return { name: item }
                 })
             }
             res.send(template(data));
@@ -158,10 +158,10 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList
         app.use(webpackDevMiddleware(compiler, {
             publicPath: config.output.publicPath
         }));
-        
+
 
         app.listen(port, function () {
-            gUtil.log('[webpack-dev-server]', `started at port ${port}`);
+            log('[webpack-dev-server]', `started at port ${port}`);
         });
 
         open(`http://127.0.0.1:${port}/`);

@@ -123,7 +123,7 @@ import MyLib from '../src/index';
 
 Run `gulp dev`, it will open your browser with `http://127.0.0.1:3000` (by default) and show the list of demos as following:
 
-// TODO: image
+![dev-ui](https://xieguanglei.github.io/gulp-webpack-tasks-ttob/space/assets/dev-ui.png)
 
 Click `link` to enter link pages and do developing.
 
@@ -146,11 +146,9 @@ describe('mylib', function () {
 
 Run `gulp test` and the test result will be ouputed to console.
 
-// TODO: image
-
 ### build task
 
-```
+```javascript
 gulp.task('build', libTasks.build);
 ```
 
@@ -158,7 +156,7 @@ Run `gulp build` will pack your `entry` (by default is './src/index.js') to a um
 
 ### compile task
 
-```
+```javascript
 gulp.task('build', libTasks.build);
 ```
 
@@ -174,35 +172,37 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 
 ### options
 
-| name             | description                                                 | type    | default            |
-| ---------------- | ----------------------------------------------------------- | ------- | ------------------ |
-| port             | dev server port                                             | Number  | 3000               |
-| base             | base directory of the project                               | Sting   | process.cwd()      |
-| src              | the source code directory                                   | String  | './src'            |
-| demo             | the demo pages directory (for development or present)       | String  | './demo'           |
-| dist             | the build file directory (for umd files)                    | String  | './dist'           |
-| devSuffix        | the bundle file's suffix for development enviroment         | String  | 'bundle'           |
-| buildSuffix      | the bundle file's suffix for build target                   | String  | 'bundle'           |
-| react            | whether to transform JSX                                    | Boolean | false              |
-| loaders          | extra webpack loaders                                       | Array   | []                 |
-| plugins          | extra webpack plugins                                       | Array   | []                 |
-| babelPolyfill    | whether to import babelPolyfill                             | Boolean | false              |
-| devCors          | whether to enable CORS on dev server                        | Boolean | true               |
-| watchTest        | whether to use watch mode for test task                     | Boolean | false              |
-| testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
+| name             | description                                           | type    | default            |
+| ---------------- | ----------------------------------------------------- | ------- | ------------------ |
+| port             | dev server port                                       | Number  | 3000               |
+| base             | base directory of the project                         | Sting   | process.cwd()      |
+| src              | the source code directory                             | String  | './src'            |
+| demo             | the demo pages directory (for development or present) | String  | './demo'           |
+| dist             | the build file directory (for umd files)              | String  | './dist'           |
+| devSuffix        | the bundle file's suffix for development enviroment   | String  | 'bundle'           |
+| buildSuffix      | the bundle file's suffix for build target             | String  | 'bundle'           |
+| react            | whether to transform JSX                              | Boolean | false              |
+| loaders          | extra webpack loaders                                 | Array   | []                 |
+| plugins          | extra webpack plugins                                 | Array   | []                 |
+| babelPolyfill    | whether to import babelPolyfill                       | Boolean | false              |
+| devCors          | whether to enable CORS on dev server                  | Boolean | true               |
+| watchTest        | whether to use watch mode for test task               | Boolean | false              |
+| testEntryPattern | file path pattern for test entries                    | String  | 'src/**/*.spec.js' |
+| commonsChunk     | whether to enable commonsChunk plugin                 | Boolean | true               |
 
-Compared with libaray task options, there are 4 differences:
+Compared with libaray task options, there are several differences:
 
 1. You don't need to provide entry option.
 2. You don't need to provide umdName option.
 3. You don't need to provide lib option.
 4. Default option of buildSuffix is `bundle` but not `min`.
+5. You can use commonsChunk option to enable commonsChunk plugin.
 
 ### directory structure
 
 The main project's directory structure may looks like:
 
-```
+```bash
 project
 │   README.md
 │   package.json
@@ -228,6 +228,24 @@ Compared with library tasks, there are 2 main differences.
 
 1. lib directory is not necessary anymore.
 2. dist directory is a map to demo directory (for library tasks there's only 1 file `${umdName}.${buildSuffix}.js`).
+3. if you enable commonsChunk plugin, the html file should also include commons file, like: 
+
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script src="./commons.bundle.js"></script>
+    <script src="./foo.bundle.js"></script>
+</body>
+</html>
+```
 
 ### dev task
 

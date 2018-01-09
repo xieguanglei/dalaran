@@ -17,7 +17,7 @@ const Handlebars = require('handlebars');
 
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
-    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill }) {
+    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -60,6 +60,15 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         // is generating karma webpack config
     } else {
         throw 'get webpack config input not valid';
+    }
+
+    if(commonsChunk){
+        plugins.push(
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'commons',
+                filename: `commons.${suffix}.js`
+            })
+        )
     }
 
     if (react) {
@@ -204,7 +213,8 @@ const libraryTasks = function (
             babelOptions,
             loaders,
             plugins,
-            babelPolyfill
+            babelPolyfill,
+            commonsChunk: false
         }),
         demo,
         port,
@@ -227,7 +237,8 @@ const libraryTasks = function (
                 react,
                 loaders,
                 plugins,
-                babelPolyfill
+                babelPolyfill,
+                commonsChunk: false
             })))
             .pipe(gulp.dest(dist));
     }
@@ -257,7 +268,8 @@ const libraryTasks = function (
                 react,
                 loaders,
                 plugins,
-                babelPolyfill
+                babelPolyfill,
+                commonsChunk: false
             }),
             webpackMiddleware: {
                 quiet: true
@@ -286,7 +298,8 @@ const applicationTasks = function (
         babelPolyfill = false,
         devCors = true,
         watchTest = false,
-        testEntryPattern = 'src/**/*.spec.js'
+        testEntryPattern = 'src/**/*.spec.js',
+        commonsChunk = true
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -303,7 +316,8 @@ const applicationTasks = function (
             react,
             loaders,
             plugins,
-            babelPolyfill
+            babelPolyfill,
+            commonsChunk
         }),
         demo,
         port,
@@ -325,7 +339,8 @@ const applicationTasks = function (
                 react,
                 loaders,
                 plugins,
-                babelPolyfill
+                babelPolyfill,
+                commonsChunk
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')
@@ -348,7 +363,8 @@ const applicationTasks = function (
                 react,
                 loaders,
                 plugins,
-                babelPolyfill
+                babelPolyfill,
+                commonsChunk: false
             }),
             webpackMiddleware: {}
         }, done).start();

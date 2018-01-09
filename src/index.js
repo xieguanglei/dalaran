@@ -66,7 +66,8 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         plugins.push(
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'commons',
-                filename: `commons.${suffix}.js`
+                filename: `commons.${suffix}.js`,
+                minChunks: 2
             })
         )
     }

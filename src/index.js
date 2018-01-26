@@ -62,7 +62,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         throw 'get webpack config input not valid';
     }
 
-    if(commonsChunk){
+    if (commonsChunk) {
         plugins.push(
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'commons',
@@ -123,19 +123,27 @@ const getBabelOptions = function ({ react }) {
 }
 
 const getDemoEntries = function (dir) {
-    const filesInDemo = fs.readdirSync(dir);
-    const demoEntryList = filesInDemo.map(file => {
-        if (path.extname(file) === '.js') {
-            const baseName = path.basename(file, '.js');
-            const htmlFileName = path.basename(file, '.js') + '.html';
-            if (filesInDemo.indexOf(htmlFileName) !== -1) {
-                return baseName;
-            }
-        }
-        return null;
-    }).filter(Boolean);
 
-    return demoEntryList;
+    if (fs.existsSync(dir)) {
+
+        const filesInDemo = fs.readdirSync(dir);
+        const demoEntryList = filesInDemo.map(file => {
+            if (path.extname(file) === '.js') {
+                const baseName = path.basename(file, '.js');
+                const htmlFileName = path.basename(file, '.js') + '.html';
+                if (filesInDemo.indexOf(htmlFileName) !== -1) {
+                    return baseName;
+                }
+            }
+            return null;
+        }).filter(Boolean);
+
+        return demoEntryList;
+
+    } else {
+
+        return null;
+    }
 }
 
 const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList }) {
@@ -204,7 +212,7 @@ const libraryTasks = function (
     const demoEntryList = getDemoEntries(demo);
     const babelOptions = getBabelOptions({ react });
 
-    const dev = getDevTask({
+    const dev = demoEntryList ? getDevTask({
         webpackConfig: getWebpackConfig({
             entrys: demoEntryList,
             base,
@@ -222,7 +230,9 @@ const libraryTasks = function (
         react,
         devCors,
         demoEntryList
-    });
+    }) : function(){
+        log.error(`Warning : There's no demo entries in directory ${demo}, the dev task does nothing.`);
+    }
 
     const build = function () {
         fs.emptyDirSync(dist);

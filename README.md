@@ -1,4 +1,8 @@
-Gulp Webpack Tasks out-of-box
+Dalaran is a light weighted tool helping you to simplify your [Webpack](https://webpack.js.org/) config for developing. Compared with some heavy develop environment frameworks, dalaran gives you back the right to build your own progress, with [Gulp](https://gulpjs.com/) to manage tasks.
+
+> the name `Dalaran` comes from Dalaran the city, a magic city in video game World of Warcraft.
+
+Here the docs go:
 
 Get tired of doing webpack config, babel, karma and so on ? Just want to write es6/7 code without too much configuration ? This tool is what you are looking for.
 
@@ -23,9 +27,9 @@ Your gulpfile may looks like:
 
 ```
 const gulp = requir('gulp');
-const tasks = requre('gulp-webpack-tasks-ootb');
+const dalaran = requre('dalaran');
 
-const libTasks = tasks.libraryTasks({...options});
+const libTasks = dalaran.libraryTasks({...options});
 
 gulp.task('dev', libTasks.dev);
 gulp.task('test', libTasks.test);
@@ -189,6 +193,7 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | watchTest        | whether to use watch mode for test task               | Boolean | false              |
 | testEntryPattern | file path pattern for test entries                    | String  | 'src/**/*.spec.js' |
 | commonsChunk     | whether to enable commonsChunk plugin                 | Boolean | true               |
+| publicPath       | deploy publicPath                                     | String  | './'               |
 
 Compared with libaray task options, there are several differences:
 

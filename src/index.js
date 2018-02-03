@@ -17,7 +17,7 @@ const Handlebars = require('handlebars');
 
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
-    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk }) {
+    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -60,6 +60,10 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         // is generating karma webpack config
     } else {
         throw 'get webpack config input not valid';
+    }
+
+    if(publicPath){
+        outputConfig.publicPath = publicPath;
     }
 
     if (commonsChunk) {
@@ -310,7 +314,8 @@ const applicationTasks = function (
         devCors = true,
         watchTest = false,
         testEntryPattern = 'src/**/*.spec.js',
-        commonsChunk = true
+        commonsChunk = true,
+        publicPath = './'
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -351,7 +356,8 @@ const applicationTasks = function (
                 loaders,
                 plugins,
                 babelPolyfill,
-                commonsChunk
+                commonsChunk,
+                publicPath
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')

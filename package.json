@@ -1,12 +1,11 @@
 {
-  "name": "gulp-webpack-tasks-ootb",
-  "version": "0.1.4",
+  "name": "dalaran",
+  "version": "0.1.5",
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "xieguanglei/gulp-webpack-tasks-ootb",
+  "repository": "xieguanglei/dalaran",
   "dependencies": {
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.0",
@@ -45,6 +44,6 @@
     "gulp": "^3.9.1"    
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "author": "xieguanglei@hotmail.com",
+  "license": "MIT"
 }

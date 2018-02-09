@@ -227,11 +227,11 @@ const libraryTasks = function (
             loaders,
             plugins,
             babelPolyfill,
-            commonsChunk: false
+            commonsChunk: false,
+            react
         }),
         demo,
         port,
-        react,
         devCors,
         demoEntryList
     }) : function(){

@@ -14,6 +14,7 @@ const cors = require('cors');
 const KarmaServer = require('karma').Server;
 const open = require('open');
 const Handlebars = require('handlebars');
+const replace = require('gulp-replace');
 
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
@@ -62,7 +63,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         throw 'get webpack config input not valid';
     }
 
-    if(publicPath){
+    if (publicPath) {
         outputConfig.publicPath = publicPath;
     }
 
@@ -234,7 +235,7 @@ const libraryTasks = function (
         port,
         devCors,
         demoEntryList
-    }) : function(){
+    }) : function () {
         log.error(`Warning : There's no demo entries in directory ${demo}, the dev task does nothing.`);
     }
 
@@ -361,7 +362,9 @@ const applicationTasks = function (
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')
+            .pipe(replace('__TIMESTAMP__', 'timestamp='+Date.now()))
             .pipe(gulp.dest(dist));
+
         return [taskBuild, taskHtml];
     }
 

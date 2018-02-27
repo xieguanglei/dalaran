@@ -16,9 +16,11 @@ const open = require('open');
 const Handlebars = require('handlebars');
 const replace = require('gulp-replace');
 
+const pwd = process.cwd();
+
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
-    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath }) {
+    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath, eslint }) {
 
     const entryConfig = {};
     const outputConfig = {
@@ -32,10 +34,18 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         {
             test: /\.js$/,
             exclude: /(node_modules)/,
-            use: {
-                loader: 'babel-loader',
-                options: babelOptions
-            }
+            use: [
+                {
+                    loader: 'babel-loader',
+                    options: babelOptions
+                },
+                ...(
+                    eslint ? [{
+                        loader: "eslint-loader",
+                        options: getESLintOptions()
+                    }] : []
+                )
+            ]
         },
         ...extraLoaders
     ]
@@ -97,7 +107,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         entry: entryConfig,
         output: outputConfig,
         module: {
-            loaders,
+            loaders
         },
         plugins
     }
@@ -125,6 +135,18 @@ const getBabelOptions = function ({ react }) {
     }
 
     return res;
+}
+
+const getESLintOptions = function () {
+
+    const option = {};
+
+    const hasOwnConfigFile = fs.existsSync(path.join(pwd, '.eslintrc'));
+    if(!hasOwnConfigFile){
+        option.configFile = path.join(__dirname, '../space/eslint-config.json');
+    }
+
+    return option;
 }
 
 const getDemoEntries = function (dir) {
@@ -210,7 +232,8 @@ const libraryTasks = function (
         babelPolyfill = false,
         devCors = true,
         watchTest = false,
-        testEntryPattern = 'src/**/*.spec.js'
+        testEntryPattern = 'src/**/*.spec.js',
+        eslint = true
     } = {}
 ) {
 
@@ -229,7 +252,8 @@ const libraryTasks = function (
             plugins,
             babelPolyfill,
             commonsChunk: false,
-            react
+            react,
+            eslint
         }),
         demo,
         port,
@@ -254,7 +278,8 @@ const libraryTasks = function (
                 loaders,
                 plugins,
                 babelPolyfill,
-                commonsChunk: false
+                commonsChunk: false,
+                eslint
             })))
             .pipe(gulp.dest(dist));
     }
@@ -285,7 +310,8 @@ const libraryTasks = function (
                 loaders,
                 plugins,
                 babelPolyfill,
-                commonsChunk: false
+                commonsChunk: false,
+                eslint: false
             }),
             webpackMiddleware: {
                 quiet: true
@@ -316,7 +342,8 @@ const applicationTasks = function (
         watchTest = false,
         testEntryPattern = 'src/**/*.spec.js',
         commonsChunk = true,
-        publicPath = './'
+        publicPath = './',
+        eslint = true
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -334,7 +361,8 @@ const applicationTasks = function (
             loaders,
             plugins,
             babelPolyfill,
-            commonsChunk
+            commonsChunk,
+            eslint
         }),
         demo,
         port,
@@ -358,11 +386,12 @@ const applicationTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk,
-                publicPath
+                publicPath,
+                eslint
             })))
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')
-            .pipe(replace('__TIMESTAMP__', 'timestamp='+Date.now()))
+            .pipe(replace('__TIMESTAMP__', 'timestamp=' + Date.now()))
             .pipe(gulp.dest(dist));
 
         return [taskBuild, taskHtml];
@@ -384,7 +413,8 @@ const applicationTasks = function (
                 loaders,
                 plugins,
                 babelPolyfill,
-                commonsChunk: false
+                commonsChunk: false,
+                eslint: false
             }),
             webpackMiddleware: {}
         }, done).start();

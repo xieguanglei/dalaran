@@ -65,6 +65,7 @@ You need to create these tasks by call `tasks.libraryTasks(options)`.
 | devCors          | whether to enable CORS on dev server                        | Boolean | true               |
 | watchTest        | whether to use watch mode for test task                     | Boolean | false              |
 | testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
+| eslint           | whether to enable eslint                                    | Boolean | true               |
 
 ### directory structure
 
@@ -127,9 +128,11 @@ import MyLib from '../src/index';
 
 Run `gulp dev`, it will open your browser with `http://127.0.0.1:3000` (by default) and show the list of demos as following:
 
-![dev-ui](https://xieguanglei.github.io/gulp-webpack-tasks-ttob/space/assets/dev-ui.png)
+![dev-ui](https://xieguanglei.github.io/dalaran/space/assets/dev-ui.png)
 
 Click `link` to enter link pages and do developing.
+
+Notice that eslint is enabled by default, and a default config file will be provided, unless you put a .eslintrc in your project's root directory.
 
 ### test task
 
@@ -194,6 +197,7 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | testEntryPattern | file path pattern for test entries                    | String  | 'src/**/*.spec.js' |
 | commonsChunk     | whether to enable commonsChunk plugin                 | Boolean | true               |
 | publicPath       | deploy publicPath                                     | String  | './'               |
+| eslint           | whether to enable eslint                              | Boolean | true               |
 
 Compared with libaray task options, there are several differences:
 

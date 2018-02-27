@@ -1,5 +1,3 @@
-
-
 class Caculator {
 
     static add(x, y) {

@@ -1,3 +1,5 @@
+[中文文档](https://xieguanglei.github.io/blog/post/dalaran-the-webpack-tool.html)
+
 Dalaran is a light weighted tool helping you to simplify your [Webpack](https://webpack.js.org/) config for developing. Compared with some heavy develop environment frameworks, dalaran gives you back the right to build your own progress, with [Gulp](https://gulpjs.com/) to manage tasks.
 
 > the name `Dalaran` comes from Dalaran the city, a magic city in video game World of Warcraft.

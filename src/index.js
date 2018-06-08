@@ -16,6 +16,7 @@ const open = require('open');
 const Handlebars = require('handlebars');
 const replace = require('gulp-replace');
 const gulpESLint = require('gulp-eslint');
+const mergeStream = require('merge-stream');
 
 const pwd = process.cwd();
 
@@ -402,7 +403,7 @@ const applicationTasks = function (
             .pipe(replace('__TIMESTAMP__', 'timestamp=' + Date.now()))
             .pipe(gulp.dest(dist));
 
-        return [taskBuild, taskHtml];
+        return mergeStream(taskBuild, taskHtml);
     }
 
     const test = function (done) {

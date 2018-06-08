@@ -15,6 +15,7 @@ const KarmaServer = require('karma').Server;
 const open = require('open');
 const Handlebars = require('handlebars');
 const replace = require('gulp-replace');
+const gulpESLint = require('gulp-eslint');
 
 const pwd = process.cwd();
 
@@ -142,7 +143,7 @@ const getESLintOptions = function () {
     const option = {};
 
     const hasOwnConfigFile = fs.existsSync(path.join(pwd, '.eslintrc'));
-    if(!hasOwnConfigFile){
+    if (!hasOwnConfigFile) {
         option.configFile = path.join(__dirname, '../space/eslint-config.json');
     }
 
@@ -319,8 +320,15 @@ const libraryTasks = function (
         }, done).start();
     }
 
+    const lint = function () {
+        return gulp.src(path.join(base, src, '**/*.js'))
+            .pipe(gulpESLint(getESLintOptions()))
+            .pipe(gulpESLint.format())
+            .pipe(gulpESLint.failAfterError());
+    }
+
     return {
-        dev, build, compile, test
+        dev, build, compile, test, lint: eslint ? lint : null
     }
 }
 
@@ -420,8 +428,17 @@ const applicationTasks = function (
         }, done).start();
     }
 
-    return { dev, build, test };
+    const lint = function () {
+
+        return gulp.src(path.join(base, demo, '**/*.js'))
+            .pipe(gulpESLint(getESLintOptions()))
+            .pipe(gulpESLint.format())
+            .pipe(gulpESLint.failAfterError());
+    }
+
+    return { dev, build, test, lint: eslint ? lint : null };
 }
+
 
 
 module.exports = { libraryTasks, applicationTasks };

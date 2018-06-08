@@ -10,3 +10,4 @@ const aTasks = opack.applicationTasks({
 
 gulp.task('build', aTasks.build);
 gulp.task('dev', aTasks.dev);
+gulp.task('lint', aTasks.lint);

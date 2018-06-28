@@ -68,7 +68,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         entryConfig[umdName.toLowerCase()] = useBabelPolyfill ? ['babel-polyfill', entry] : [entry];
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
-        outputConfig.filename = `[name].${suffix}.js`;
+        outputConfig.filename = minify ? `[name].${suffix}.js` : `[name].js`;
     } else if (!entry && !entrys) {
         // is generating karma webpack config
     } else {
@@ -235,7 +235,8 @@ const libraryTasks = function (
         devCors = true,
         watchTest = false,
         testEntryPattern = 'src/**/*.spec.js',
-        eslint = true
+        eslint = true,
+        minify = true
     } = {}
 ) {
 
@@ -275,7 +276,7 @@ const libraryTasks = function (
                 dist,
                 suffix: buildSuffix,
                 babelOptions,
-                minify: true,
+                minify,
                 react,
                 loaders,
                 plugins,
@@ -338,7 +339,6 @@ const applicationTasks = function (
     {
         port = 3000,
         base = process.cwd(),
-        src = './src',
         demo = './demo',
         dist = './dist',
         devSuffix = 'bundle',
@@ -352,7 +352,8 @@ const applicationTasks = function (
         testEntryPattern = 'src/**/*.spec.js',
         commonsChunk = true,
         publicPath = './',
-        eslint = true
+        eslint = true,
+        minify = true
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -389,7 +390,7 @@ const applicationTasks = function (
                 dist,
                 suffix: buildSuffix,
                 babelOptions,
-                minify: true,
+                minify,
                 react,
                 loaders,
                 plugins,

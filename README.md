@@ -68,6 +68,7 @@ You need to create these tasks by call `tasks.libraryTasks(options)`.
 | watchTest        | whether to use watch mode for test task                     | Boolean | false              |
 | testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
 | eslint           | whether to enable eslint                                    | Boolean | true               |
+| minify           | whether to uglify js for build task                         | Boolean | true               |
 
 ### directory structure
 
@@ -185,7 +186,6 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | ---------------- | ----------------------------------------------------- | ------- | ------------------ |
 | port             | dev server port                                       | Number  | 3000               |
 | base             | base directory of the project                         | Sting   | process.cwd()      |
-| src              | the source code directory                             | String  | './src'            |
 | demo             | the demo pages directory (for development or present) | String  | './demo'           |
 | dist             | the build file directory (for umd files)              | String  | './dist'           |
 | devSuffix        | the bundle file's suffix for development enviroment   | String  | 'bundle'           |
@@ -200,6 +200,7 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | commonsChunk     | whether to enable commonsChunk plugin                 | Boolean | true               |
 | publicPath       | deploy publicPath                                     | String  | './'               |
 | eslint           | whether to enable eslint                              | Boolean | true               |
+| minify           | whether to uglify js for build task                   | Boolean | true               |
 
 Compared with libaray task options, there are several differences:
 

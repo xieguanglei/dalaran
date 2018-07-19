@@ -4,6 +4,7 @@ const express = require('express');
 const webpack = require('webpack');
 const webpackStream = require('webpack-stream');
 const webpackDevMiddleware = require('webpack-dev-middleware');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 const path = require('path');
 const { exec } = require('child_process');
 const fs = require('fs-extra');
@@ -22,13 +23,14 @@ const pwd = process.cwd();
 
 
 const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
-    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath, eslint }) {
+    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath, eslint, liveReload }) {
 
     const entryConfig = {};
     const outputConfig = {
         path: path.join(base, dist),
         publicPath: '/'
     };
+
     const plugins = [
         ...extraPlugins
     ];
@@ -103,6 +105,10 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
 
     if (minify) {
         plugins.push(new UglifyJSPlugin());
+    }
+
+    if(liveReload){
+        plugins.push(new LiveReloadPlugin());
     }
 
     var config = {
@@ -206,7 +212,6 @@ const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList
             publicPath: config.output.publicPath
         }));
 
-
         app.listen(port, function () {
             log('[webpack-dev-server]', `started at port ${port}`);
         });
@@ -236,7 +241,8 @@ const libraryTasks = function (
         watchTest = false,
         testEntryPattern = 'src/**/*.spec.js',
         eslint = true,
-        minify = true
+        minify = true,
+        liveReload = false
     } = {}
 ) {
 
@@ -256,7 +262,8 @@ const libraryTasks = function (
             babelPolyfill,
             commonsChunk: false,
             react,
-            eslint
+            eslint,
+            liveReload
         }),
         demo,
         port,
@@ -353,7 +360,8 @@ const applicationTasks = function (
         commonsChunk = true,
         publicPath = './',
         eslint = true,
-        minify = true
+        minify = true,
+        liveReload = false
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
@@ -372,7 +380,8 @@ const applicationTasks = function (
             plugins,
             babelPolyfill,
             commonsChunk,
-            eslint
+            eslint,
+            liveReload
         }),
         demo,
         port,
@@ -402,6 +411,7 @@ const applicationTasks = function (
             .pipe(gulp.dest(dist));
         const taskHtml = gulp.src(demo + '/*.html')
             .pipe(replace('__TIMESTAMP__', 'timestamp=' + Date.now()))
+            .pipe(replace(/<script src=\".+livereload.js\"><\/script>/g, ''))
             .pipe(gulp.dest(dist));
 
         return mergeStream(taskBuild, taskHtml);

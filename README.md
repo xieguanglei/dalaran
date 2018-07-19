@@ -69,6 +69,7 @@ You need to create these tasks by call `tasks.libraryTasks(options)`.
 | testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
 | eslint           | whether to enable eslint                                    | Boolean | true               |
 | minify           | whether to uglify js for build task                         | Boolean | true               |
+| liveReload       | whether to enable live reload                               | Boolean | fasle              |
 
 ### directory structure
 
@@ -201,6 +202,7 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | publicPath       | deploy publicPath                                     | String  | './'               |
 | eslint           | whether to enable eslint                              | Boolean | true               |
 | minify           | whether to uglify js for build task                   | Boolean | true               |
+| liveReload       | whether to enable live reload                         | Boolean | fasle              |
 
 Compared with libaray task options, there are several differences:
 

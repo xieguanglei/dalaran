@@ -1,3 +1,3 @@
 import Caculator from '../src/index';
 
-console.log(Caculator.add(1,2));
+console.log(Caculator.add(1,1));

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>{{name}}</title>
+</head>
+
+<body>
+    
+    {{#if liveReload}}
+    <script src="http://localhost:35729/livereload.js"></script>
+    {{/if}}
+    {{#if commons}}
+    <script src="./commons.{{suffix}}.js"></script>
+    {{/if}}
+    <script src="./{{name}}.{{suffix}}.js"></script>
+</body>
+
+</html>

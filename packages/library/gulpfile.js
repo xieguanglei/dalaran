@@ -17,3 +17,5 @@ gulp.task('test', lTasks.test);
 gulp.task('build', lTasks.build);
 
 gulp.task('compile', lTasks.compile);
+
+gulp.task('demo', lTasks.demo);

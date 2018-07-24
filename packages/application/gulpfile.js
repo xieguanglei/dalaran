@@ -7,3 +7,4 @@ const appTasks = tasks.applicationTasks({
 
 gulp.task('dev', appTasks.dev);
 gulp.task('build', appTasks.build);
+gulp.task('page', appTasks.page);

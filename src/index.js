@@ -240,8 +240,8 @@ const getAddTask = function ({ demo, htmlTemplate, jsTemplate, liveReload, suffi
             properties: {
                 name: {
                     description: 'Enter the NAME of demo/page you want to create',
-                    pattern: /^[a-zA-Z\-]+$/,
-                    message: 'Name must be only letters and dashes.',
+                    pattern: /^[0-9a-zA-Z\-]+$/,
+                    message: 'Name must be only letters, numbers and dashes.',
                     required: true
                 }
             }

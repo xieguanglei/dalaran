@@ -18,6 +18,7 @@ const cors = require('cors');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 
 const LiveReloadPlugin = require('webpack-livereload-plugin');
+const FlowWebpackPlugin = require('flow-webpack-plugin');
 const KarmaServer = require('karma').Server;
 const gulpESLint = require('gulp-eslint');
 
@@ -31,7 +32,7 @@ const open = require('open');
 const pwd = process.cwd();
 
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react,
+const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react, flow,
     loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath, eslint, liveReload }) {
 
     const entryConfig = {};
@@ -112,6 +113,12 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
         })
     }
 
+    if (flow) {
+        plugins.push(
+            new FlowWebpackPlugin()
+        )
+    }
+
     if (minify) {
         plugins.push(new UglifyJSPlugin());
     }
@@ -132,7 +139,7 @@ const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptio
     return config;
 };
 
-const getBabelOptions = function ({ react }) {
+const getBabelOptions = function ({ react, flow }) {
     const res = {
         "presets": [
             "env",
@@ -148,6 +155,11 @@ const getBabelOptions = function ({ react }) {
     if (react) {
         res.plugins.push(
             "transform-react-jsx"
+        )
+    }
+    if (flow) {
+        res.presets.push(
+            "flow"
         )
     }
 
@@ -302,6 +314,7 @@ const libraryTasks = function (
         umdName = 'foo',
         devSuffix = 'bundle',
         buildSuffix = 'min',
+        flow = false,
         react = false,
         loaders = [],
         plugins = [],
@@ -318,7 +331,7 @@ const libraryTasks = function (
 ) {
 
     const demoEntryList = getDemoEntries(demo);
-    const babelOptions = getBabelOptions({ react });
+    const babelOptions = getBabelOptions({ react, flow });
 
     const dev = demoEntryList ? getDevTask({
         webpackConfig: getWebpackConfig({
@@ -334,7 +347,8 @@ const libraryTasks = function (
             commonsChunk: false,
             react,
             eslint,
-            liveReload
+            liveReload,
+            flow,
         }),
         demo,
         port,
@@ -360,7 +374,8 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk: false,
-                eslint
+                eslint,
+                flow,
             })))
             .pipe(gulp.dest(dist));
     }
@@ -414,7 +429,7 @@ const libraryTasks = function (
             .pipe(gulpESLint(getESLintOptions()))
             .pipe(gulpESLint.format())
             .pipe(gulpESLint.failAfterError());
-    }
+    };
 
     return {
         dev, build, compile, test, demo: add, lint: eslint ? lint : null
@@ -430,6 +445,7 @@ const applicationTasks = function (
         dist = './dist',
         devSuffix = 'bundle',
         buildSuffix = 'bundle',
+        flow = false,
         react = false,
         loaders = [],
         plugins = [],
@@ -447,7 +463,7 @@ const applicationTasks = function (
     } = {}
 ) {
     const demoEntryList = getDemoEntries(demo);
-    const babelOptions = getBabelOptions({ react });
+    const babelOptions = getBabelOptions({ react, flow });
 
     const dev = getDevTask({
         webpackConfig: getWebpackConfig({
@@ -457,6 +473,7 @@ const applicationTasks = function (
             dist,
             suffix: devSuffix,
             babelOptions,
+            flow,
             react,
             loaders,
             plugins,
@@ -482,6 +499,7 @@ const applicationTasks = function (
                 suffix: buildSuffix,
                 babelOptions,
                 minify,
+                flow,
                 react,
                 loaders,
                 plugins,
@@ -541,7 +559,6 @@ const applicationTasks = function (
 
     return { dev, build, test, page: add, lint: eslint ? lint : null };
 }
-
 
 
 module.exports = { libraryTasks, applicationTasks };

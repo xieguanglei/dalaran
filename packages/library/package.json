@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "flow": "flow"
+  },
   "devDependencies": {
     "expect": "^21.2.1",
     "glob": "^7.1.2",

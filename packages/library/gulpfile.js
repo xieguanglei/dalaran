@@ -7,7 +7,9 @@ const lTasks = tasks.libraryTasks({
     loaders: [],
     plugins: [],
     testEntryPattern : 'test/**/*.spec.js',
-    liveReload: true
+    liveReload: true,
+    flow: true,
+    eslint: false
 });
 
 gulp.task('dev', lTasks.dev);

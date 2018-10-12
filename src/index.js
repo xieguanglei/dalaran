@@ -1,332 +1,70 @@
 const path = require('path');
 
-const gulp = require('gulp');
+
 const log = require('fancy-log');
 const glob = require('glob');
 const fs = require('fs-extra');
-const replace = require('gulp-replace');
 
-const webpack = require('webpack');
-const webpackStream = require('webpack-stream');
-const mergeStream = require('merge-stream');
 
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const babel = require('babel-core');
 
-const express = require('express');
-const cors = require('cors');
-const webpackDevMiddleware = require('webpack-dev-middleware');
-
-const LiveReloadPlugin = require('webpack-livereload-plugin');
-const FlowWebpackPlugin = require('flow-webpack-plugin');
 const KarmaServer = require('karma').Server;
-const gulpESLint = require('gulp-eslint');
-
-const prompt = require('prompt');
-prompt.colors = false;
-
-const Handlebars = require('handlebars');
-const open = require('open');
 
 
-const pwd = process.cwd();
+
+const getWebpackConfig = require('./getWebpackConfig');
+const getBabelOptions = require('./getBabelOptions');
+const getDemoEntries = require('./getDemoEntries');
+
+const getAddTask = require('./taskAdd');
+const getDevTask = require('./taskDev');
 
 
-const getWebpackConfig = function ({ entrys, entry, base, demo, dist, babelOptions, umdName, suffix, minify, react, flow,
-    loaders: extraLoaders, plugins: extraPlugins, babelPolyfill: useBabelPolyfill, commonsChunk, publicPath, eslint, liveReload }) {
+const webpack = require('webpack');
 
-    const entryConfig = {};
-    const outputConfig = {
-        path: path.join(base, dist),
-        publicPath: '/'
-    };
-
-    const plugins = [
-        ...extraPlugins
-    ];
-    const loaders = [
-        {
-            test: /\.js$/,
-            exclude: /(node_modules)/,
-            use: [
-                {
-                    loader: 'babel-loader',
-                    options: babelOptions
-                },
-                ...(
-                    eslint ? [{
-                        loader: "eslint-loader",
-                        options: getESLintOptions()
-                    }] : []
-                )
-            ]
-        },
-        ...extraLoaders
-    ]
-
-    if (entrys && demo) {
-        // application
-        entrys.forEach(file => {
-            const res = [];
-            if (useBabelPolyfill) {
-                res.push('babel-polyfill');
-            }
-            res.push(demo + '/' + file + '.js');
-            entryConfig[file] = res;
-        });
-        outputConfig.filename = `[name].${suffix}.js`;
-    } else if (entry && umdName) {
-        // libaray
-        entryConfig[umdName.toLowerCase()] = useBabelPolyfill ? ['babel-polyfill', entry] : [entry];
-        outputConfig.library = umdName;
-        outputConfig.libraryTarget = 'umd';
-        outputConfig.filename = minify ? `[name].${suffix}.js` : `[name].js`;
-    } else if (!entry && !entrys) {
-        // is generating karma webpack config
-    } else {
-        throw 'get webpack config input not valid';
-    }
-
-    if (publicPath) {
-        outputConfig.publicPath = publicPath;
-    }
-
-    if (commonsChunk) {
-        plugins.push(
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'commons',
-                filename: `commons.${suffix}.js`,
-                minChunks: 2
-            })
-        )
-    }
-
-    if (react) {
-        loaders.push({
-            test: /\.less$/,
-            exclude: /(node_modules)/,
-            use: [
-                'style-loader',
-                'css-loader',
-                'less-loader'
-            ]
-        })
-    }
-
-    if (flow) {
-        plugins.push(
-            new FlowWebpackPlugin()
-        )
-    }
-
-    if (minify) {
-        plugins.push(new UglifyJSPlugin());
-    }
-
-    if (liveReload) {
-        plugins.push(new LiveReloadPlugin());
-    }
-
-    var config = {
-        entry: entryConfig,
-        output: outputConfig,
-        module: {
-            loaders
-        },
-        plugins
-    }
-
-    return config;
-};
-
-const getBabelOptions = function ({ react, flow }) {
-    const res = {
-        "presets": [
-            "env",
-            "stage-0"
-        ],
-        "plugins": [
-            "transform-class-properties",
-            "transform-object-rest-spread",
-            "transform-decorators-legacy",
-            "add-module-exports"
-        ]
-    };
-    if (react) {
-        res.plugins.push(
-            "transform-react-jsx"
-        )
-    }
-    if (flow) {
-        res.presets.push(
-            "flow"
-        )
-    }
-
-    return res;
-}
-
-const getESLintOptions = function () {
-
-    const option = {};
-
-    const hasOwnConfigFile = fs.existsSync(path.join(pwd, '.eslintrc'));
-    if (!hasOwnConfigFile) {
-        option.configFile = path.join(__dirname, '../space/eslint-config.json');
-    }
-
-    return option;
-}
-
-const getDemoEntries = function (dir) {
-
-    if (fs.existsSync(dir)) {
-
-        const filesInDemo = fs.readdirSync(dir);
-        const demoEntryList = filesInDemo.map(file => {
-            if (path.extname(file) === '.js') {
-                const baseName = path.basename(file, '.js');
-                const htmlFileName = path.basename(file, '.js') + '.html';
-                if (filesInDemo.indexOf(htmlFileName) !== -1) {
-                    return baseName;
-                }
-            }
-            return null;
-        }).filter(Boolean);
-
-        return demoEntryList;
-
-    } else {
-
-        return null;
-    }
-}
-
-const getDevTask = function ({ webpackConfig, demo, port, devCors, demoEntryList }) {
-
-    const dev = function (cb) {
-
-        const config = webpackConfig;
-        const app = express();
-        const compiler = webpack(config);
-        if (devCors) {
-            app.use(cors());
-        }
-
-        app.get('/', function (req, res) {
-            const templateStr = fs.readFileSync(
-                path.join(__dirname, '../space/demo-list.handlebars'),
-                'utf-8'
-            );
-            const template = Handlebars.compile(templateStr);
-
-            const data = {
-                demos: demoEntryList.map(item => {
-                    return { name: item }
-                })
-            }
-            res.send(template(data));
-        });
-
-        app.use(express.static(demo));
-        app.use(webpackDevMiddleware(compiler, {
-            publicPath: config.output.publicPath
-        }));
-
-        app.listen(port, function () {
-            log('[webpack-dev-server]', `started at port ${port}`);
-        });
-
-        open(`http://127.0.0.1:${port}/`);
-    }
-    return dev;
-}
-
-const getAddTask = function ({ demo, htmlTemplate, jsTemplate, liveReload, suffix, commonsChunk }) {
-
-    return function (done) {
-
-        prompt.start();
-
-        prompt.get({
-            properties: {
-                name: {
-                    description: 'Enter the NAME of demo/page you want to create',
-                    pattern: /^[0-9a-zA-Z\-]+$/,
-                    message: 'Name must be only letters, numbers and dashes.',
-                    required: true
-                }
-            }
-        }, function (err, result) {
-
-            if (!err) {
-
-                const { name } = result;
-
-                const targetPathHtml = path.resolve(demo, `${name}.html`);
-                const targetPathJS = path.resolve(demo, `${name}.js`);
-
-                if (fs.existsSync(targetPathHtml) || fs.existsSync(targetPathJS)) {
-                    done(new Error(`The file ${name}.html or ${name}.js exists. You could change a name or remove the file before creating a new one.`));
-                } else {
-
-                    const templateHTML = Handlebars.compile(fs.readFileSync(htmlTemplate, 'utf-8'));
-                    const templateJS = Handlebars.compile(fs.readFileSync(jsTemplate, 'utf-8'));
-
-                    fs.writeFileSync(targetPathHtml, templateHTML({
-                        name,
-                        liveReload,
-                        suffix,
-                        commons: commonsChunk
-                    }));
-
-                    fs.writeFileSync(targetPathJS, templateJS({
-                        name,
-                        liveReload,
-                        suffix,
-                        commons: commonsChunk
-                    }));
-
-                    log(`Add demo/page success, you need to restart dev task to see the new created demo/page.`)
-
-                    done();
-                }
-
-            } else {
-                done(err);
-            }
-
-        })
-
-    }
-
-}
 
 const libraryTasks = function (
     {
-        port = 3000,
+
         base = process.cwd(),
         entry = './src/index.js',
         src = './src',
-        lib = './lib',
+
+        // for dev
         demo = './demo',
-        dist = './dist',
-        umdName = 'foo',
         devSuffix = 'bundle',
+        port = 3000,
+        devCors = true,
+        liveReload = false,
+
+        // for build
+        dist = './dist',
+        umdName = 'Unnamed',
         buildSuffix = 'min',
+        minify = true,
+
+        // for compile
+        lib = './lib',
+
+        // for test
+        testEntryPattern = 'src/**/*.spec.js',
+        watchTest = false,
+
+        // for add
+        htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
+        jsTemplate = path.resolve(__dirname, '../space/js-template.handlebars'),
+
+        // configs
+
+        babelPolyfill = false,
         flow = false,
         react = false,
+
+        eslint = false,
+
         loaders = [],
         plugins = [],
-        babelPolyfill = false,
-        devCors = true,
-        watchTest = false,
-        testEntryPattern = 'src/**/*.spec.js',
-        eslint = true,
-        minify = true,
-        liveReload = false,
-        htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
-        jsTemplate = path.resolve(__dirname, '../space/js-template.handlebars')
+
     } = {}
 ) {
 
@@ -354,14 +92,19 @@ const libraryTasks = function (
         port,
         devCors,
         demoEntryList
+
     }) : function () {
         log.error(`Warning : There's no demo entries in directory ${demo}, the dev task does nothing.`);
-    }
+    };
 
-    const build = function () {
+    const noop = () => { };
+
+    const build = function (done = noop) {
+
         fs.emptyDirSync(dist);
-        return gulp.src(entry)
-            .pipe(webpackStream(getWebpackConfig({
+
+        webpack(
+            getWebpackConfig({
                 entry,
                 base,
                 umdName,
@@ -376,18 +119,26 @@ const libraryTasks = function (
                 commonsChunk: false,
                 eslint,
                 flow,
-            })))
-            .pipe(gulp.dest(dist));
-    }
+            }),
+            (err, stats) => {
+                if (err || stats.hasErrors()) {
+                    throw new Error(err || stats.hasErrors())
+                }
+                log('Build Success');
+                done();
+            }
+        )
+    };
 
-    const compile = function () {
+    const compile = function (done = noop) {
         fs.emptyDirSync(lib);
         const files = glob.sync(src + '/**/*.js');
-        files.forEach(function (file) {
+        files.filter(file => !file.endsWith('spec.js')).forEach(function (file) {
             const res = babel.transformFileSync(file, babelOptions);
             const target = file.replace(src, lib);
             fs.outputFileSync(target, res.code, 'utf-8');
         });
+        done();
     }
 
     const test = function (done) {
@@ -396,7 +147,6 @@ const libraryTasks = function (
             testEntryPattern,
             singleRun: watchTest ? false : true,
             webpack: getWebpackConfig({
-                entry,
                 base,
                 umdName,
                 dist,
@@ -424,44 +174,57 @@ const libraryTasks = function (
         commonsChunk: false
     });
 
-    const lint = function () {
-        return gulp.src(path.join(base, src, '**/*.js'))
-            .pipe(gulpESLint(getESLintOptions()))
-            .pipe(gulpESLint.format())
-            .pipe(gulpESLint.failAfterError());
-    };
-
     return {
-        dev, build, compile, test, demo: add, lint: eslint ? lint : null
+        dev,
+        build,
+        compile,
+        test,
+        add
     }
 }
 
 
 const applicationTasks = function (
+
     {
-        port = 3000,
+
         base = process.cwd(),
+
+        // for dev
         demo = './demo',
-        dist = './dist',
         devSuffix = 'bundle',
+        port = 3000,
+        devCors = true,
+        liveReload = false,
+
+        // for build
+        dist = './dist',
         buildSuffix = 'bundle',
+        minify = true,
+        publicPath = './',
+
+        // for test
+        testEntryPattern = 'src/**/*.spec.js',
+        watchTest = false,
+
+        // for add
+        htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
+        jsTemplate = path.resolve(__dirname, '../space/js-template.handlebars'),
+
+        // config
+        babelPolyfill = false,
         flow = false,
         react = false,
+
+        commonsChunk = true,
+        eslint = false,
+
         loaders = [],
         plugins = [],
-        babelPolyfill = false,
-        devCors = true,
-        watchTest = false,
-        testEntryPattern = 'src/**/*.spec.js',
-        commonsChunk = true,
-        publicPath = './',
-        eslint = true,
-        minify = true,
-        liveReload = false,
-        htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
-        jsTemplate = path.resolve(__dirname, '../space/js-template.handlebars')
+
     } = {}
 ) {
+
     const demoEntryList = getDemoEntries(demo);
     const babelOptions = getBabelOptions({ react, flow });
 
@@ -488,10 +251,12 @@ const applicationTasks = function (
         demoEntryList
     });
 
-    const build = function () {
+    const build = function (done = () => { }) {
+
         fs.emptyDirSync(dist);
-        const taskBuild = gulp.src(demoEntryList)
-            .pipe(webpackStream(getWebpackConfig({
+
+        webpack(
+            getWebpackConfig({
                 entrys: demoEntryList,
                 demo,
                 base,
@@ -507,25 +272,41 @@ const applicationTasks = function (
                 commonsChunk,
                 publicPath,
                 eslint
-            })))
-            .pipe(gulp.dest(dist));
-        const taskHtml = gulp.src(demo + '/*.html')
-            .pipe(replace('__TIMESTAMP__', 'timestamp=' + Date.now()))
-            .pipe(replace(/<script src=\".+livereload.js\"><\/script>/g, ''))
-            .pipe(gulp.dest(dist));
+            }),
+            (err, stats) => {
+                if (err || stats.hasErrors()) {
+                    throw new Error(err || stats.hasErrors())
+                }
+                copyHTMLs();
+                log('Build Success');
+                done();
+            }
+        )
 
-        return mergeStream(taskBuild, taskHtml);
+        function copyHTMLs() {
+            const htmlFiles = glob.sync(demo + '/*.html');
+
+            htmlFiles.forEach(file => {
+
+                const content = fs.readFileSync(file, 'utf-8');
+                const baseName = path.basename(file);
+
+                const modifiedContent = content.replace(/__TIMESTAMP__/g, 'timestamp=' + Date.now())
+                    .replace(/<script src=\".+livereload.js\"><\/script>/g, '');
+
+                fs.outputFile(dist + `/${baseName}`, modifiedContent);
+            });
+        }
     }
 
     const test = function (done) {
+        console.log(demoEntryList);
         new KarmaServer({
             configFile: path.join(__dirname, '../space/karma.conf.js'),
             testEntryPattern,
             singleRun: watchTest ? false : true,
             webpack: getWebpackConfig({
-                entry: demoEntryList,
                 base,
-                umdName,
                 dist,
                 suffix: buildSuffix,
                 babelOptions,
@@ -549,15 +330,7 @@ const applicationTasks = function (
         commonsChunk
     });
 
-    const lint = function () {
-
-        return gulp.src(path.join(base, demo, '**/*.js'))
-            .pipe(gulpESLint(getESLintOptions()))
-            .pipe(gulpESLint.format())
-            .pipe(gulpESLint.failAfterError());
-    }
-
-    return { dev, build, test, page: add, lint: eslint ? lint : null };
+    return { dev, build, test, add };
 }
 
 

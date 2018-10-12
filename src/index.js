@@ -6,11 +6,9 @@ const glob = require('glob');
 const fs = require('fs-extra');
 
 
-const babel = require('babel-core');
+const babel = require('@babel/core');
 
 const KarmaServer = require('karma').Server;
-
-
 
 const getWebpackConfig = require('./getWebpackConfig');
 const getBabelOptions = require('./getBabelOptions');

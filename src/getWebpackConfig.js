@@ -148,12 +148,19 @@ const getWebpackConfig = function ({
     // output config
 
     var config = {
+
         entry: entryConfig,
+
         output: outputConfig,
+
         module: {
             loaders
         },
-        plugins
+        plugins,
+
+        resolveLoader: {
+            modules: ['node_modules', path.resolve(__dirname, '../node_modules')]
+        }
     }
 
     return config;

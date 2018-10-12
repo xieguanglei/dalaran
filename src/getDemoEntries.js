@@ -1,7 +1,7 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const getDemoEntries = function (dir) {
+const getDemoEntries = function ({ demo: dir, typescript }) {
 
     if (fs.existsSync(dir)) {
 

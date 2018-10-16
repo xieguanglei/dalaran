@@ -55,7 +55,7 @@ const libraryTasks = function (
         typescript = false,
         react = false,
 
-        eslint = false,
+        lint = false,
 
         loaders = [],
         plugins = [],
@@ -79,7 +79,7 @@ const libraryTasks = function (
             babelPolyfill,
             commonsChunk: false,
             react,
-            eslint,
+            lint,
             liveReload,
             typescript,
         }),
@@ -111,7 +111,7 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk: false,
-                eslint,
+                lint,
                 typescript,
             }),
             (err, stats) => {
@@ -154,7 +154,7 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk: false,
-                eslint: false,
+                lint: false,
                 typescript,
             }),
             webpackMiddleware: {

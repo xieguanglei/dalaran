@@ -13,7 +13,7 @@ const log = require('fancy-log');
 
 const taskDev = function ({ webpackConfig, demo, port, devCors, demoEntryList }) {
 
-    const dev = function (cb) {
+    const dev = function () {
 
         const config = webpackConfig;
         const app = express();

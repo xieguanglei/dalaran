@@ -2,7 +2,6 @@ const path = require('path');
 
 const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const getESLintOptions = require('./getESLintOptions');
 
@@ -24,7 +23,7 @@ const getWebpackConfig = function ({
     // configs
     react,
     typescript,
-    eslint,
+    lint,
     commonsChunk,
     liveReload,
     minify,
@@ -44,6 +43,7 @@ const getWebpackConfig = function ({
     const plugins = [
         ...extraPlugins
     ];
+
     const loaders = [
         {
             test: /\.js$/,
@@ -54,7 +54,7 @@ const getWebpackConfig = function ({
                     options: babelOptions
                 },
                 ...(
-                    eslint ? [{
+                    lint ? [{
                         loader: "eslint-loader",
                         options: getESLintOptions()
                     }] : []
@@ -174,11 +174,6 @@ const getWebpackConfig = function ({
 
         resolve: {
             extensions: [".ts", ".js"],
-            // plugins: [
-            //     new TsconfigPathsPlugin({
-            //         configFile: path.join(__dirname, '../space/tsconfig.json')
-            //     })
-            // ]
         },
 
         resolveLoader: {

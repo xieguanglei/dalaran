@@ -5,10 +5,6 @@ const getBabelOptions = function ({ react }) {
             require('@babel/preset-env')
         ],
         plugins: [
-            // "transform-class-properties",
-            // "transform-object-rest-spread",
-            // "transform-decorators-legacy",
-            // "add-module-exports"
         ]
     };
 

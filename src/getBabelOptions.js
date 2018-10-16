@@ -1,4 +1,4 @@
-const getBabelOptions = function ({ react, flow }) {
+const getBabelOptions = function ({ react }) {
 
     const res = {
         presets: [
@@ -11,12 +11,6 @@ const getBabelOptions = function ({ react, flow }) {
             // "add-module-exports"
         ]
     };
-
-    if (flow) {
-        res.presets = [
-            require('@babel/preset-typescript')
-        ]
-    }
 
     if (react) {
         res.plugins.push(

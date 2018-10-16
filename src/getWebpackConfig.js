@@ -2,7 +2,7 @@ const path = require('path');
 
 const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
-const FlowWebpackPlugin = require('flow-webpack-plugin');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const getESLintOptions = require('./getESLintOptions');
 
@@ -23,7 +23,7 @@ const getWebpackConfig = function ({
 
     // configs
     react,
-    flow,
+    typescript,
     eslint,
     commonsChunk,
     liveReload,
@@ -61,6 +61,23 @@ const getWebpackConfig = function ({
                 )
             ]
         },
+        {
+            test: /\.ts$/,
+            exclude: /(node_modules)/,
+            use: [
+                {
+                    loader: 'babel-loader',
+                    options: babelOptions
+                },
+                {
+                    loader: 'ts-loader',
+                    options: {
+                        context: base,
+                        configFile: path.join(__dirname, '../space/tsconfig.json')
+                    }
+                }
+            ]
+        },
         ...extraLoaders
     ]
 
@@ -73,7 +90,7 @@ const getWebpackConfig = function ({
             if (useBabelPolyfill) {
                 res.push('babel-polyfill');
             }
-            res.push(demo + '/' + file + '.js');
+            res.push(demo + '/' + file + (typescript ? '.ts' : '.js'));
             entryConfig[file] = res;
         });
 
@@ -86,7 +103,9 @@ const getWebpackConfig = function ({
     } else if (entry && umdName) {
 
         // libaray
+
         entryConfig[umdName.toLowerCase()] = useBabelPolyfill ? ['babel-polyfill', entry] : [entry];
+
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
         outputConfig.filename = minify ? `[name].${suffix}.js` : `[name].js`;
@@ -121,12 +140,6 @@ const getWebpackConfig = function ({
 
     // built-in plugins
 
-    if (flow) {
-        plugins.push(
-            new FlowWebpackPlugin()
-        )
-    }
-
     if (minify) {
         plugins.push(new UglifyJSPlugin());
     }
@@ -154,13 +167,25 @@ const getWebpackConfig = function ({
         output: outputConfig,
 
         module: {
-            loaders
+            rules: loaders
         },
+
         plugins,
+
+        resolve: {
+            extensions: [".ts", ".js"],
+            // plugins: [
+            //     new TsconfigPathsPlugin({
+            //         configFile: path.join(__dirname, '../space/tsconfig.json')
+            //     })
+            // ]
+        },
 
         resolveLoader: {
             modules: ['node_modules', path.resolve(__dirname, '../node_modules')]
-        }
+        },
+
+        mode: 'none'
     }
 
     return config;

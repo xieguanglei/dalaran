@@ -5,11 +5,13 @@ const getDemoEntries = function ({ demo: dir, typescript }) {
 
     if (fs.existsSync(dir)) {
 
+        const extName = typescript ? '.ts' : '.js';
+
         const filesInDemo = fs.readdirSync(dir);
         const demoEntryList = filesInDemo.map(file => {
-            if (path.extname(file) === '.js') {
-                const baseName = path.basename(file, '.js');
-                const htmlFileName = path.basename(file, '.js') + '.html';
+            if (path.extname(file) === extName) {
+                const baseName = path.basename(file, extName);
+                const htmlFileName = path.basename(file, extName) + '.html';
                 if (filesInDemo.indexOf(htmlFileName) !== -1) {
                     return baseName;
                 }

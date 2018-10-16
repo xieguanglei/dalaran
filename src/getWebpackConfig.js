@@ -4,6 +4,7 @@ const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
 const getESLintOptions = require('./getESLintOptions');
+const getTSLintOptions = require('./getTSLintOptions');
 
 const getWebpackConfig = function ({
 
@@ -52,13 +53,7 @@ const getWebpackConfig = function ({
                 {
                     loader: 'babel-loader',
                     options: babelOptions
-                },
-                ...(
-                    lint ? [{
-                        loader: "eslint-loader",
-                        options: getESLintOptions()
-                    }] : []
-                )
+                }
             ]
         },
         {
@@ -136,6 +131,38 @@ const getWebpackConfig = function ({
                 'less-loader'
             ]
         })
+    }
+
+    if (lint) {
+
+        loaders.push({
+            test: /\.js$/,
+            exclude: /(node_modules)/,
+            enforce: 'pre',
+            use: [
+                {
+                    loader: 'eslint-loader',
+                    options: getESLintOptions()
+                }
+            ]
+        });
+
+        if (typescript) {
+
+            loaders.push({
+                test: /\.ts$/,
+                exclude: /(node_modules)/,
+                enforce: 'pre',
+                use: [
+                    {
+                        loader: 'tslint-loader',
+                        options: getTSLintOptions()
+                    }
+                ]
+            })
+
+        }
+
     }
 
     // built-in plugins

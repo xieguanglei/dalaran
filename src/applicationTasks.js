@@ -52,7 +52,7 @@ const applicationTasks = function (
         react = false,
 
         commonsChunk = true,
-        eslint = false,
+        lint = false,
 
         loaders = [],
         plugins = [],
@@ -77,7 +77,7 @@ const applicationTasks = function (
             plugins,
             babelPolyfill,
             commonsChunk,
-            eslint,
+            lint,
             liveReload
         }),
         demo,
@@ -106,7 +106,7 @@ const applicationTasks = function (
                 babelPolyfill,
                 commonsChunk,
                 publicPath,
-                eslint
+                lint
             }),
             (err, stats) => {
                 if (err || stats.hasErrors()) {
@@ -149,7 +149,7 @@ const applicationTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk: false,
-                eslint: false,
+                lint: false,
                 typescript
             }),
             webpackMiddleware: {}

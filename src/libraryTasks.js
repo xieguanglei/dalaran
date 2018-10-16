@@ -128,6 +128,14 @@ const libraryTasks = function (
     };
 
     const compile = function (done = noop) {
+
+        if (typescript) {
+            throw new Error('Compile task not support for typescript projects.');
+        }
+        if (loaders.length !== 0) {
+            throw new Error('Compile task not support extra loaders');
+        }
+
         fs.emptyDirSync(lib);
         const files = glob.sync(src + '/**/*.js');
         files.filter(file => !file.endsWith('spec.js')).forEach(function (file) {
@@ -135,6 +143,7 @@ const libraryTasks = function (
             const target = file.replace(src, lib);
             fs.outputFileSync(target, res.code, 'utf-8');
         });
+
         done();
     }
 

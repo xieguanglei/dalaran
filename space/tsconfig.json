@@ -1,6 +1,12 @@
 {
+    "compilerOptions": {
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "target": "es5",
+    },
     "include": [
         "**/*.ts"
-    ],
-    "exclude": []
+    ]
 }

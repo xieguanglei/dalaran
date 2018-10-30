@@ -5,7 +5,7 @@ const getDemoEntries = function ({ demo: dir, typescript }) {
 
     if (fs.existsSync(dir)) {
 
-        const extName = typescript ? '.ts' : '.js';
+        const extName = typescript ? '.js' : '.js';
 
         const filesInDemo = fs.readdirSync(dir);
         const demoEntryList = filesInDemo.map(file => {

@@ -85,7 +85,7 @@ const getWebpackConfig = function ({
             if (useBabelPolyfill) {
                 res.push('babel-polyfill');
             }
-            res.push(demo + '/' + file + (typescript ? '.ts' : '.js'));
+            res.push(demo + '/' + file + (typescript ? '.js' : '.js'));
             entryConfig[file] = res;
         });
 
@@ -103,6 +103,7 @@ const getWebpackConfig = function ({
 
         outputConfig.library = umdName;
         outputConfig.libraryTarget = 'umd';
+        outputConfig.libraryExport = 'default';
         outputConfig.filename = minify ? `[name].${suffix}.js` : `[name].js`;
 
     } else if (!entry && !entrys) {
@@ -160,9 +161,7 @@ const getWebpackConfig = function ({
                     }
                 ]
             })
-
         }
-
     }
 
     // built-in plugins

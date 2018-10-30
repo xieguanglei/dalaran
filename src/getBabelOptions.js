@@ -1,3 +1,5 @@
+const path = require('path');
+
 const getBabelOptions = function ({ react }) {
 
     const res = {
@@ -5,6 +7,7 @@ const getBabelOptions = function ({ react }) {
             require('@babel/preset-env')
         ],
         plugins: [
+            require("@babel/plugin-proposal-class-properties"),
         ]
     };
 

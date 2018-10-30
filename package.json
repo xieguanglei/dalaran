@@ -7,6 +7,7 @@
   "repository": "xieguanglei/dalaran",
   "dependencies": {
     "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
     "@babel/preset-env": "^7.1.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",

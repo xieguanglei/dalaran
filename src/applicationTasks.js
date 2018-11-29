@@ -1,7 +1,7 @@
 const path = require('path');
 
 
-const log = require('fancy-log');
+
 const glob = require('glob');
 const fs = require('fs-extra');
 
@@ -113,7 +113,6 @@ const applicationTasks = function (
                     throw new Error(err || stats.hasErrors())
                 }
                 copyHTMLs();
-                log('Build Success');
                 done();
             }
         )

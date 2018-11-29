@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
 const Handlebars = require('handlebars');
-const log = require('fancy-log');
 
 const prompt = require('prompt');
 prompt.colors = false;
@@ -58,7 +57,7 @@ const taskAdd = function ({
                         commons: commonsChunk
                     }));
 
-                    log(`Add demo/page success, you need to restart dev task to see the new created demo/page.`)
+                    console.log(`Add demo/page success, you need to restart dev task to see the new created demo/page.`)
 
                     done();
                 }

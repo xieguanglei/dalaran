@@ -1,6 +1,5 @@
 const path = require('path');
 
-const log = require('fancy-log');
 const glob = require('glob');
 const fs = require('fs-extra');
 
@@ -88,7 +87,7 @@ const libraryTasks = function (
         devCors,
         demoEntryList
     }) : function () {
-        log.error(`Warning : There's no demo entries in directory ${demo}, the dev task does nothing.`);
+        console.error(`Warning : There's no demo entries in directory ${demo}, the dev task does nothing.`);
     };
 
     const noop = () => { };
@@ -121,7 +120,6 @@ const libraryTasks = function (
                 if (stats.hasErrors()) {
                     throw stats.toJson().errors;
                 }
-                log('Build Success');
                 done();
             }
         )

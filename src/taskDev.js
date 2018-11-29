@@ -7,7 +7,7 @@ const express = require('express');
 const cors = require('cors');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpack = require('webpack');
-const log = require('fancy-log');
+
 
 
 
@@ -44,7 +44,7 @@ const taskDev = function ({ webpackConfig, demo, port, devCors, demoEntryList })
         }));
 
         app.listen(port, function () {
-            log('[webpack-dev-server]', `started at port ${port}`);
+            console.log('[webpack-dev-server]', `started at port ${port}`);
         });
 
         open(`http://127.0.0.1:${port}/`);

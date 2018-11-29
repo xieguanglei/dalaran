@@ -10,7 +10,7 @@ Get tired of doing webpack config, babel, karma and so on ? Just want to write e
 
 Basiclly the tool can do these for you:
 
-* config webpack within some default loaders, plugins; config babel within confortable presets.
+* config webpack within some default loaders, plugins; config babel within comfortable presets.
 * automatically find entries and specify dist through given rules (you are still able to customize).
 * run mocha tests in karma and chrome without much configuration.
 * provide a development enviroment using webpack-dev-middleware and express.
@@ -199,7 +199,6 @@ You need to create these tasks by call `tasks.applicationTasks(options)`.
 | devCors          | whether to enable CORS on dev server                  | Boolean | true               |
 | watchTest        | whether to use watch mode for test task               | Boolean | false              |
 | testEntryPattern | file path pattern for test entries                    | String  | 'src/**/*.spec.js' |
-| commonsChunk     | whether to enable commonsChunk plugin                 | Boolean | true               |
 | publicPath       | deploy publicPath                                     | String  | './'               |
 | lint             | whether to enable lint                                | Boolean | false              |
 | minify           | whether to uglify js for build task                   | Boolean | true               |
@@ -212,7 +211,6 @@ Compared with libaray task options, there are several differences:
 2. You don't need to provide umdName option.
 3. You don't need to provide lib option.
 4. Default option of buildSuffix is `bundle` but not `min`.
-5. You can use commonsChunk option to enable commonsChunk plugin.
 
 ### directory structure
 
@@ -244,24 +242,6 @@ Compared with library tasks, there are 2 main differences.
 
 1. lib directory is not necessary anymore.
 2. dist directory is a map to demo directory (for library tasks there's only 1 file `${umdName}.${buildSuffix}.js`).
-3. if you enable commonsChunk plugin, the html file should also include commons file, like: 
-
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <script src="./commons.bundle.js"></script>
-    <script src="./foo.bundle.js"></script>
-</body>
-</html>
-```
 
 ### dev task
 

@@ -41,6 +41,8 @@ const getWebpackConfig = function ({
         publicPath: '/'
     };
 
+    const optimization = {};
+
     const plugins = [
         ...extraPlugins
     ];
@@ -175,13 +177,7 @@ const getWebpackConfig = function ({
     }
 
     if (commonsChunk) {
-        plugins.push(
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'commons',
-                filename: `commons.${suffix}.js`,
-                minChunks: 2
-            })
-        )
+        // TODO: commons chunk
     }
 
     // output config
@@ -206,7 +202,9 @@ const getWebpackConfig = function ({
             modules: ['node_modules', path.resolve(__dirname, '../node_modules')]
         },
 
-        mode: 'none'
+        mode: 'none',
+
+        optimization
     }
 
     return config;

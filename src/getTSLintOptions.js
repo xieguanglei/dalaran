@@ -3,12 +3,14 @@ const path = require('path');
 
 const pwd = process.cwd();
 
-const getTSLintOptions = function () {
+const getTSLintOptions = function ({ lintrcDir }) {
 
     const option = {};
+    const hasOwnConfigFile = fs.existsSync(path.join(lintrcDir, 'tslint.json'));
 
-    const hasOwnConfigFile = fs.existsSync(path.join(pwd, '.tslintrc'));
-    if (!hasOwnConfigFile) {
+    if (hasOwnConfigFile) {
+        option.configFile = path.join(lintrcDir, 'tslint.json');
+    } else {
         option.configFile = path.join(__dirname, '../space/tslint-config.json');
     }
 

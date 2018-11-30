@@ -25,6 +25,7 @@ const getWebpackConfig = function ({
     react,
     typescript,
     lint,
+    lintrcDir,
     commonsChunk,
     liveReload,
     minify,
@@ -145,7 +146,7 @@ const getWebpackConfig = function ({
             use: [
                 {
                     loader: 'eslint-loader',
-                    options: getESLintOptions()
+                    options: getESLintOptions({ lintrcDir })
                 }
             ]
         });
@@ -159,7 +160,7 @@ const getWebpackConfig = function ({
                 use: [
                     {
                         loader: 'tslint-loader',
-                        options: getTSLintOptions()
+                        options: getTSLintOptions({ lintrcDir })
                     }
                 ]
             })

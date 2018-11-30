@@ -55,6 +55,7 @@ const libraryTasks = function (
         react = false,
 
         lint = false,
+        lintrcDir = process.cwd(),
 
         loaders = [],
         plugins = [],
@@ -79,6 +80,7 @@ const libraryTasks = function (
             commonsChunk: false,
             react,
             lint,
+            lintrcDir,
             liveReload,
             typescript,
         }),
@@ -110,7 +112,8 @@ const libraryTasks = function (
                 plugins,
                 babelPolyfill,
                 commonsChunk: false,
-                lint,
+                lint: false,
+                lintrcDir,
                 typescript,
             }),
             (err, stats) => {

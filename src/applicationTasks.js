@@ -53,6 +53,7 @@ const applicationTasks = function (
 
         commonsChunk = true,
         lint = false,
+        lintrcDir = process.cwd(),
 
         loaders = [],
         plugins = [],
@@ -78,6 +79,7 @@ const applicationTasks = function (
             babelPolyfill,
             commonsChunk,
             lint,
+            lintrcDir,
             liveReload
         }),
         demo,
@@ -106,7 +108,8 @@ const applicationTasks = function (
                 babelPolyfill,
                 commonsChunk,
                 publicPath,
-                lint
+                lint,
+                lintrcDir,
             }),
             (err, stats) => {
                 if (err || stats.hasErrors()) {

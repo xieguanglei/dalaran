@@ -1,6 +1,9 @@
 const path = require('path');
 
 module.exports = function (config) {
+    // we have config.testEntryPattern
+    //         config.webpackMiddleware
+    //         config.webpack
     config.set({
       basePath: '',
       plugins: [
@@ -10,12 +13,11 @@ module.exports = function (config) {
       ],
       frameworks: ['mocha'],
       files: [path.resolve(process.cwd(), config.testEntryPattern)],
-      exclude: [
-      ],
+      exclude: [],
       preprocessors: {
         [path.resolve(process.cwd(), config.testEntryPattern)]: ['webpack'],
       },
-      webpack: config.webpack,
+      webpack: {...config.webpack, entry: undefined},
       webpackMiddleware: config.webpackMiddleware,
       reporters: ['progress'],
       port: 9876,

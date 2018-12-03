@@ -1,5 +1,3 @@
-const path = require('path');
-
 const getBabelOptions = function ({ react }) {
 
     const res = {

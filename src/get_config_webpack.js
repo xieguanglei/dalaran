@@ -1,10 +1,11 @@
 const path = require('path');
 
-const webpack = require('webpack');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 const UglifyJSPlugin = require('uglifyjs-webpack-plugin');
-const getESLintOptions = require('./getESLintOptions');
-const getTSLintOptions = require('./getTSLintOptions');
+
+const getESLintOptions = require('./get_config_eslint');
+const getTSLintOptions = require('./get_config_tslint');
+const getBabelOptions = require('./get_config_babel');
 
 const getWebpackConfig = function ({
 
@@ -18,7 +19,6 @@ const getWebpackConfig = function ({
     publicPath, // used only in appliaction mode
 
     // use babel by default
-    babelOptions,
     babelPolyfill: useBabelPolyfill,
 
     // configs
@@ -47,6 +47,8 @@ const getWebpackConfig = function ({
     const plugins = [
         ...extraPlugins
     ];
+
+    const babelOptions = getBabelOptions({ react, typescript });
 
     const loaders = [
         {

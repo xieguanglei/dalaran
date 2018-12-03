@@ -8,10 +8,52 @@ const cors = require('cors');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpack = require('webpack');
 
+const getWebpackConfig = require('./get_config_webpack');
+const getDemoEntries = require('./get_demo_entries');
 
+const taskDev = function ({
 
+    base,
+    demo,
+    devSuffix,
 
-const taskDev = function ({ webpackConfig, demo, port, devCors, demoEntryList }) {
+    port,
+    devCors,
+    liveReload,
+
+    babelPolyfill,
+    react,
+    typescript,
+
+    lint,
+    lintrcDir,
+
+    loaders,
+    plugins,
+
+}) {
+
+    const demoEntryList = getDemoEntries({
+        demo,
+        typescript
+    });
+
+    const webpackConfig = getWebpackConfig({
+        entrys: demoEntryList,
+        base,
+        demo,
+        dist: 'dist',
+        suffix: devSuffix,
+        loaders,
+        plugins,
+        babelPolyfill,
+        react,
+        lint,
+        lintrcDir,
+        liveReload,
+        typescript,
+    });
+
 
     const dev = function () {
 

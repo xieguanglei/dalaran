@@ -10,8 +10,7 @@ const taskAdd = function ({
     htmlTemplate,
     jsTemplate,
     liveReload,
-    suffix,
-    commonsChunk
+    suffix
 }) {
 
     return function (done = () => {}) {
@@ -46,15 +45,13 @@ const taskAdd = function ({
                     fs.outputFileSync(targetPathHtml, templateHTML({
                         name,
                         liveReload,
-                        suffix,
-                        commons: commonsChunk
+                        suffix
                     }));
 
                     fs.outputFileSync(targetPathJS, templateJS({
                         name,
                         liveReload,
-                        suffix,
-                        commons: commonsChunk
+                        suffix
                     }));
 
                     console.log(`Add demo/page success, you need to restart dev task to see the new created demo/page.`)

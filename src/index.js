@@ -1,4 +1,4 @@
-const libraryTasks = require('./libraryTasks');
-const applicationTasks = require('./applicationTasks');
+const libraryTasks = require('./tasks_library');
+const applicationTasks = require('./tasks_application');
 
 module.exports = { libraryTasks, applicationTasks };

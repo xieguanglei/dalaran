@@ -1,7 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
 
-const pwd = process.cwd();
 
 const getTSLintOptions = function ({ lintrcDir }) {
 

@@ -1,262 +1,96 @@
-[中文文档](https://xieguanglei.github.io/blog/post/dalaran-the-webpack-tool.html)
+# 中文文档
 
-Dalaran is a light weighted tool helping you to simplify your [Webpack](https://webpack.js.org/) config for developing. Compared with some heavy develop environment frameworks, dalaran gives you back the right to build your own progress, with [Gulp](https://gulpjs.com/) to manage tasks.
+Dalaran 是一个简单的前端开发环境，它可以帮助你简化 Webpack / Babel / Typescript / ESLint / TSLint / Karma / Mocha 配置。基本上，它可以接管你的开发调试、测试、Lint、打包过程。
 
-> the name `Dalaran` comes from Dalaran the city, a magic city in video game World of Warcraft.
-
-Here the docs go:
-
-Get tired of doing webpack config, babel, karma and so on ? Just want to write es6/7 code without too much configuration ? This tool is what you are looking for.
-
-Basiclly the tool can do these for you:
-
-* config webpack within some default loaders, plugins; config babel within comfortable presets.
-* automatically find entries and specify dist through given rules (you are still able to customize).
-* run mocha tests in karma and chrome without much configuration.
-* provide a development enviroment using webpack-dev-middleware and express.
-* compile or pack files up when you want to publish or deploy.
-
-# Usage
-
-Basiclly, you can use the tool when you are:
-
-* Writing a front-end application.
-* Writing a front-end library.
-
-You need to dev, build, or test your code, and each of these tasks is provided within a function, so you can use the tool with gulp (or other tools).
-
-Your gulpfile may looks like:
-
-```
-const gulp = requir('gulp');
-const dalaran = requre('dalaran');
-
-const libTasks = dalaran.libraryTasks({...options});
-
-gulp.task('dev', libTasks.dev);
-gulp.task('test', libTasks.test);
-gulp.task('prepare', function(){
-    // your local tasks
-})
-```
-
-## Tasks for writing an library
-
-4 tasks are provided when you are writing a library: the `dev` task, the `build` task, the `compile` task, the `test` task.
-
-You need to create these tasks by call `tasks.libraryTasks(options)`.
-
-### options
-
-| name             | description                                                 | type    | default            |
-| ---------------- | ----------------------------------------------------------- | ------- | ------------------ |
-| port             | dev server port                                             | Number  | 3000               |
-| base             | base directory of the project                               | Sting   | process.cwd()      |
-| entry            | library entry source code file                              | String  | './src/index.js'   |
-| src              | the source code directory                                   | String  | './src'            |
-| lib              | the compiled (to es5, for publishing to npm) code directory | String  | './lib'            |
-| demo             | the demo pages directory (for development or present)       | String  | './demo'           |
-| dist             | the build file directory (for umd files)                    | String  | './dist'           |
-| umdName          | the library's umd name                                      | String  | 'foo'              |
-| devSuffix        | the bundle file's suffix for development enviroment         | String  | 'bundle'           |
-| buildSuffix      | the bundle file's suffix for build target                   | String  | 'min'              |
-| react            | whether to transform JSX                                    | Boolean | false              |
-| loaders          | extra webpack loaders                                       | Array   | []                 |
-| plugins          | extra webpack plugins                                       | Array   | []                 |
-| babelPolyfill    | whether to import babelPolyfill                             | Boolean | false              |
-| devCors          | whether to enable CORS on dev server                        | Boolean | true               |
-| watchTest        | whether to use watch mode for test task                     | Boolean | false              |
-| testEntryPattern | file path pattern for test entries                          | String  | 'src/**/*.spec.js' |
-| lint             | whether to enable lint                                      | Boolean | false              |
-| minify           | whether to uglify js for build task                         | Boolean | true               |
-| liveReload       | whether to enable live reload                               | Boolean | fasle              |
-| typescript       | whether to enable typescript                                | Boolean | false              |
-
-### directory structure
-
-The main project's directory structure may looks like:
-
-```
-project
-│   README.md
-│   package.json
-│   gulpfile.js
-└───demo
-│       foo.html
-│       foo.js
-│       bar.html
-│       bar.js
-└───dist
-│       foo.min.js
-└───lib
-│   │   index.js
-│   └───foo
-│           foo.js
-└───src
-    │   index.js
-    └───foo
-            foo.js
-            foo.spec.js
-```
-
-### dev task
-
-```
-gulp.task('dev', libTasks.dev);
-```
-
-You need to put demo pages in the **demo** directory, which by default is './demo'. Each two files with the same basename compose a demo page, for example, `foo.html` and `foo.js` compose the `foo` demo. The html files looks like: 
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <script src="./foo.bundle.js"></script>
-</body>
-</html>
-```
-
-You can modify the html file as you like but the only one you should keep is the script tag `<script src="/foo.bundle.js"></script>`, which is the bundled file of `foo.js`. The `bundle` suffix could be changed by `devSuffix` option.
-
-The js file looks like:
-
-```
-import MyLib from '../src/index';
-// demo code
-```
-
-Run `gulp dev`, it will open your browser with `http://127.0.0.1:3000` (by default) and show the list of demos as following:
-
-![dev-ui](https://xieguanglei.github.io/dalaran/space/assets/dev-ui.png)
-
-Click `link` to enter link pages and do developing.
-
-Notice that if you set `lint` to true, a default config file will be used, unless you put a .eslintrc or .tslintrc in your project's root directory.
-
-### test task
-
-By configuring the `testEntryPattern` option, you can run tests in Karma and Chrome. A test file (`foo.spec.js` eg.) looks like:
-
-```javascript
-import expect from 'expect';
-import MyLib from '../src/index';
-
-describe('mylib', function () {
-
-    it('mylib should be ok', function(){
-        expect(!!MyLib).toBeTruthy();
-    });
-
-});
-```
-
-Run `gulp test` and the test result will be ouputed to console.
-
-### build task
-
-```javascript
-gulp.task('build', libTasks.build);
-```
-
-Run `gulp build` will pack your `entry` (by default is './src/index.js') to a umd style file and put it in `dist` directory. You need to provide a `umdName`, whick the file's name will be `${umdName.toLowercase()}.${buildSuffix}.js`. If you load the umd script directly into html, then `window.${umdName}` is available.
-
-### compile task
-
-```javascript
-gulp.task('build', libTasks.build);
-```
-
-If your source code contains only `js` file (which means you don't need extra webpack loaders to transform `.less`, `.txt`, `.jpg`), you can `compile` the source file from es6 / jsx to es5 and publish to npm for further use. At the time, you can also avoid pack dependencies to umd file. The compiled files will be put in `lib` directory(you can configure it by the `lib` option).
-
-Run `gulp compile`, and compile task will be done.
-
-## Tasks for writing an appliction
-
-3 tasks will be provided for developing an application: the `dev` task, the `build` task, the `test` task.
-
-You need to create these tasks by call `tasks.applicationTasks(options)`.
-
-### options
-
-| name             | description                                           | type    | default            |
-| ---------------- | ----------------------------------------------------- | ------- | ------------------ |
-| port             | dev server port                                       | Number  | 3000               |
-| base             | base directory of the project                         | Sting   | process.cwd()      |
-| demo             | the demo pages directory (for development or present) | String  | './demo'           |
-| dist             | the build file directory (for umd files)              | String  | './dist'           |
-| devSuffix        | the bundle file's suffix for development enviroment   | String  | 'bundle'           |
-| buildSuffix      | the bundle file's suffix for build target             | String  | 'bundle'           |
-| react            | whether to transform JSX                              | Boolean | false              |
-| loaders          | extra webpack loaders                                 | Array   | []                 |
-| plugins          | extra webpack plugins                                 | Array   | []                 |
-| babelPolyfill    | whether to import babelPolyfill                       | Boolean | false              |
-| devCors          | whether to enable CORS on dev server                  | Boolean | true               |
-| watchTest        | whether to use watch mode for test task               | Boolean | false              |
-| testEntryPattern | file path pattern for test entries                    | String  | 'src/**/*.spec.js' |
-| publicPath       | deploy publicPath                                     | String  | './'               |
-| lint             | whether to enable lint                                | Boolean | false              |
-| minify           | whether to uglify js for build task                   | Boolean | true               |
-| liveReload       | whether to enable live reload                         | Boolean | fasle              |
-| typescript       | whether to enable typescript                          | Boolean | false              |
-
-Compared with libaray task options, there are several differences:
-
-1. You don't need to provide entry option.
-2. You don't need to provide umdName option.
-3. You don't need to provide lib option.
-4. Default option of buildSuffix is `bundle` but not `min`.
-
-### directory structure
-
-The main project's directory structure may looks like:
+## 安装
 
 ```bash
-project
-│   README.md
-│   package.json
-│   gulpfile.js
-└───demo
-│       foo.html
-│       foo.js
-│       bar.html
-│       bar.js
-└───dist
-│       foo.html
-│       foo.bundle.js
-│       bar.html
-│       bar.bundle.js
-└───src
-    │   index.js
-    └───foo
-            foo.js
-            foo.spec.js
+$ npm install dalaran --save-dev
 ```
 
-Compared with library tasks, there are 2 main differences. 
+## 使用
 
-1. lib directory is not necessary anymore.
-2. dist directory is a map to demo directory (for library tasks there's only 1 file `${umdName}.${buildSuffix}.js`).
+前端开发，通常包括两种：
 
-### dev task
+* 开发前端模块（库）。
+* 开发前端应用。
 
-Dev task is exactly the same with library tasks.
+### 开发模块
 
-### test task
+调用 `libraryTasks` 来创建一些任务函数。我们提供了四个任务：`dev`，`build`，`test`。
 
-Test task is exactly the same with library tasks.
+```javascript
+const dalaran = require('dalaran');
 
-### build task
+const tasks = dalaran.libraryTasks(options);
 
-Unlike library tasks, the build task for application will pack up every page (the demo) into dist directory. It will also copy html files from demo directory to dist directory. You can deploy the js files on server, and load the js on your own page. You can also deploy the whole dist directory to some static server (gh-pages, eg), it works too.
+tasks.dev(); // 开启调试
 
-> Notice that there's no `compile` task for application.
+tasks.build(); // 构建打包
 
-## If you are still confused
+tasks.test(); // 进行测试
+```
 
-You may check the code in `packages` directory for more reference. Each of the project is an example how to use the tool.
+#### 参数
+
+| 参数名称         | 描述                          | 类型    | 默认值             |
+| ---------------- | ----------------------------- | ------- | ------------------ |
+| port             | 调试服务器端口                | Number  | 3000               |
+| base             | 项目根目录                    | Sting   | process.cwd()      |
+| entry            | 模块的入口文件                | String  | './src/index.js'   |
+| demo             | demo 目录（调试时的入口文件） | String  | './demo'           |
+| dist             | 打包文件的目录                | String  | './dist'           |
+| umdName          | 模块的 UMD 名称               | String  | 'foo'              |
+| devSuffix        | 调试时 bundle 的后缀名        | String  | 'bundle'           |
+| buildSuffix      | 打包文件的后缀名              | String  | 'min'              |
+| react            | 是否转译 JSX                  | Boolean | false              |
+| loaders          | 额外的 webpack loaders        | Array   | []                 |
+| plugins          | 额外的 webpack plugins        | Array   | []                 |
+| babelPolyfill    | 是否引入 babelPolyfill        | Boolean | false              |
+| devCors          | 调试服务器是否开启 CORS       | Boolean | true               |
+| watchTest        | 测试时是否开启 watch          | Boolean | false              |
+| testEntryPattern | 测试文件的匹配模式            | String  | 'src/**/*.spec.js' |
+| lint             | 是否开启 lint                 | Boolean | false              |
+| lintrcDir        | lint 配置文件存放目录         | String  | process.cwd()      |
+| minify           | 打包时是否压缩 JS             | Boolean | true               |
+| liveReload       | 调试时是否开启 livereload     | Boolean | fasle              |
+| typescript       | 是否开启 Typescript           | Boolean | false              |
+
+### 开发应用
+
+调用 `applicationTasks` 来创建一些任务函数。我们提供了四个任务：`dev`，`build`，`test`。
+
+```javascript
+const dalaran = require('dalaran');
+
+const tasks = dalaran.applicationTasks(options);
+
+tasks.dev(); // 开启调试
+
+tasks.build(); // 构建打包
+
+tasks.test(); // 进行测试
+```
+
+#### 参数
+
+| name             | description                   | type    | default            |
+| ---------------- | ----------------------------- | ------- | ------------------ |
+| port             | 调试服务器端口                | Number  | 3000               |
+| base             | 项目根目录                    | Sting   | process.cwd()      |
+| demo             | demo 目录（调试时的入口文件） | String  | './demo'           |
+| dist             | 打包文件的目录                | String  | './dist'           |
+| devSuffix        | 调试时 bundle 的后缀名        | String  | 'bundle'           |
+| buildSuffix      | 打包文件的后缀名              | String  | 'bundle'           |
+| react            | 是否转译 JSX                  | Boolean | false              |
+| loaders          | 额外的 webpack loaders        | Array   | []                 |
+| plugins          | 额外的 webpack plugins        | Array   | []                 |
+| babelPolyfill    | 是否引入 babelPolyfill        | Boolean | false              |
+| devCors          | 调试服务器是否开启 CORS       | Boolean | true               |
+| watchTest        | 测试时是否开启 watch          | Boolean | false              |
+| testEntryPattern | 测试文件的匹配模式            | String  | 'src/**/*.spec.js' |
+| publicPath       | 部署时的 publicPath           | String  | './'               |
+| lint             | 是否开启 lint                 | Boolean | false              |
+| minify           | 打包时是否压缩 JS             | Boolean | true               |
+| liveReload       | 调试时是否开启 livereload     | Boolean | fasle              |
+| typescript       | 是否开启 Typescript           | Boolean | false              |

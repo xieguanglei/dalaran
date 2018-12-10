@@ -5,6 +5,7 @@
         "noImplicitAny": false,
         "module": "commonjs",
         "target": "es5",
+        "downlevelIteration": true,
         "lib": ["es6", "dom"]
     },
     "include": [

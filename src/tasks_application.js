@@ -76,6 +76,7 @@ const applicationTasks = function (
         base,
         dist,
         suffix: buildSuffix,
+        // libExternals: [],
 
         minify,
 

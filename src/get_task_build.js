@@ -6,6 +6,7 @@ const getWebpackConfig = require('./get_config_webpack');
 function getTaskBuild({
 
     entry, umdName,
+    libExternals,
 
     entrys, demo,
 
@@ -35,7 +36,7 @@ function getTaskBuild({
             getWebpackConfig({
                 base,
 
-                entry, umdName, // for build library
+                entry, umdName, libExternals, // for build library
                 entrys, demo,   // for build application
 
                 dist,

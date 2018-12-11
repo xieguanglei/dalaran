@@ -11,8 +11,8 @@ const getWebpackConfig = function ({
 
     // input
     base,
-    entrys, demo,       // if (!!entrys && !!demo) is true, it's in application mode
-    entry, umdName,     // otherwise if (!!entry && !!umdName) is true, it's in library mode
+    entrys, demo,                  // if (!!entrys && !!demo) is true, it's in application mode
+    entry, umdName, libExternals,  // otherwise if (!!entry && !!umdName) is true, it's in library mode
 
     // output
     dist, suffix,
@@ -40,6 +40,9 @@ const getWebpackConfig = function ({
     const outputConfig = {
         path: path.join(base, dist),
         publicPath: '/'
+    };
+
+    const externals = {
     };
 
     const optimization = {};
@@ -102,7 +105,7 @@ const getWebpackConfig = function ({
 
     } else if (entry && umdName) {
 
-        // libaray
+        // library
 
         entryConfig[umdName.toLowerCase()] = useBabelPolyfill ? ['babel-polyfill', entry] : [entry];
 
@@ -110,6 +113,10 @@ const getWebpackConfig = function ({
         outputConfig.libraryTarget = 'umd';
         outputConfig.libraryExport = 'default';
         outputConfig.filename = minify ? `[name].${suffix}.js` : `[name].js`;
+
+        libExternals.forEach(lib => {
+            externals[lib] = lib;
+        });
 
     } else if (!entry && !entrys) {
 
@@ -207,7 +214,9 @@ const getWebpackConfig = function ({
 
         mode: 'none',
 
-        optimization
+        optimization,
+
+        externals
     }
 
     return config;

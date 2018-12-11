@@ -24,6 +24,7 @@ const libraryTasks = function (
         umdName = 'Unnamed',
         buildSuffix = 'min',
         minify = true,
+        libExternals = [],
 
         // for test
         testEntryPattern = 'src/**/*.spec.js',
@@ -77,6 +78,7 @@ const libraryTasks = function (
     
         umdName,
         suffix: buildSuffix,
+        libExternals,
     
         minify,
     
@@ -86,6 +88,7 @@ const libraryTasks = function (
         babelPolyfill,
         typescript,
         react,
+
     });
 
     const test = getTestTask({

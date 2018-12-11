@@ -8,6 +8,7 @@ function getTaskBuildLibrary({
 
     umdName,
     suffix: buildSuffix,
+    libExternals,
 
     minify,
 
@@ -30,6 +31,7 @@ function getTaskBuildLibrary({
 
             umdName,
             suffix: buildSuffix,
+            libExternals,
 
             minify,
 

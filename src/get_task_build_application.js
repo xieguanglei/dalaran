@@ -40,6 +40,7 @@ function getTaskBuildLibrary({
             dist,
 
             suffix: buildSuffix,
+            libExternals: [],
 
             minify,
 

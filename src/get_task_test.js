@@ -1,7 +1,8 @@
 const path = require('path');
 const KarmaServer = require('karma').Server;
 
-const getWebpackConfig = require('./get_config_webpack');
+
+const getKarmaConfig = require('./get_config_karma');
 
 function getTestTask({
     base,
@@ -16,15 +17,14 @@ function getTestTask({
     plugins,
 
     watchTest,
-    testEntryPattern
+    headlessMode,
+    testEntryPattern,
+    coverageFilePattern
 }) {
 
     const test = function (done) {
-        new KarmaServer({
-            configFile: path.join(__dirname, '../space/karma.conf.js'),
-            testEntryPattern,
-            singleRun: watchTest ? false : true,
-            webpack: getWebpackConfig({
+        new KarmaServer(
+            getKarmaConfig({
 
                 base,
                 dist,
@@ -37,14 +37,17 @@ function getTestTask({
                 loaders,
                 plugins,
 
-                lint: false,
-                lintrcDir: './'
+                testEntryPattern,
+                coverageFilePattern,
+
+                watchTest,
+                headlessMode
             }),
-            webpackMiddleware: {
-                quiet: true
-            }
-        }, done).start();
+            done
+        ).start();
     }
+
+
 
     return test;
 }

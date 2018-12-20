@@ -28,7 +28,9 @@ const applicationTasks = function (
 
         // for test
         testEntryPattern = 'src/**/*.spec.js',
+        coverageFilePattern = '',
         watchTest = false,
+        headlessMode = true,
 
         // for add
         htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
@@ -100,7 +102,9 @@ const applicationTasks = function (
         react,
         typescript,
         testEntryPattern,
+        coverageFilePattern,
         watchTest,
+        headlessMode
     });
 
     const add = getAddTask({

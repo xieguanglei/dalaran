@@ -1,4 +1,4 @@
-import theText from './index';
+import add from './index';
 
 const assert = (shouldBeTrue, message) => {
     if (!shouldBeTrue) {
@@ -7,9 +7,10 @@ const assert = (shouldBeTrue, message) => {
     return true;
 }
 
-describe('caculator', function () {
-    it('\'Hello World\' has 11 charactors', function (done) {
-        assert(theText.length === 11);
+describe('add', function () {
+    it('1+1=2', function (done) {
+        assert(add(1,1) === 2);
+        assert(add(1,2) === 3);
         setTimeout(done, 100);
     });
 });

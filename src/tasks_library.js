@@ -28,7 +28,9 @@ const libraryTasks = function (
 
         // for test
         testEntryPattern = 'src/**/*.spec.js',
+        coverageFilePattern = '',
         watchTest = false,
+        headlessMode = true,
 
         // for add
         htmlTemplate = path.resolve(__dirname, '../space/html-template.handlebars'),
@@ -75,16 +77,16 @@ const libraryTasks = function (
         entry,
         base,
         dist,
-    
+
         umdName,
         suffix: buildSuffix,
         libExternals,
-    
+
         minify,
-    
+
         loaders,
         plugins,
-    
+
         babelPolyfill,
         typescript,
         react,
@@ -101,7 +103,9 @@ const libraryTasks = function (
         react,
         typescript,
         testEntryPattern,
+        coverageFilePattern,
         watchTest,
+        headlessMode
     });
 
     const add = getAddTask({

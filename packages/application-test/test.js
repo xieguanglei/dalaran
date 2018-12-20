@@ -1,5 +1,6 @@
 const dalaran = require('../../src/index');
 
 dalaran.applicationTasks({
-    watchTest: true
+    watchTest: false,
+    coverageFilePattern: '**/src/index.js'
 }).test();

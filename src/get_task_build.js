@@ -51,6 +51,8 @@ function getTaskBuild({
 
                 lint: false,
                 lintrcDir: './',
+
+                sourcemap: false
             }),
             (err, stats) => {
                 if (err) {

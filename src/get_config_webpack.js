@@ -29,6 +29,7 @@ const getWebpackConfig = function ({
     commonsChunk,
     liveReload,
     minify,
+    sourcemap,
 
     // custom loaders and plugins
     loaders: extraLoaders,
@@ -193,6 +194,8 @@ const getWebpackConfig = function ({
     // output config
 
     var config = {
+
+        devtool: sourcemap ? 'inline-source-map' : undefined,
 
         entry: entryConfig,
 

@@ -64,6 +64,7 @@ function getKarmaConfig({
 
         lint: false,
         lintrcDir: './',
+        sourcemap: true
     });
 
     const karmaConfig = {

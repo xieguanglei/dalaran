@@ -52,8 +52,8 @@ const taskDev = function ({
         lintrcDir,
         liveReload,
         typescript,
+        sourcemap: true
     });
-
 
     const dev = function () {
 

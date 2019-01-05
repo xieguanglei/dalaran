@@ -97,7 +97,7 @@ function getKarmaConfig({
         browsers: headlessMode ? ['ChromeHeadless'] : ['Chrome'],
         coverageIstanbulReporter: {
             dir: path.join(process.cwd(), 'coverage'),
-            reports: ['text-summary', 'html'],
+            reports: ['text-summary', 'html', 'cobertura'],
             fixWebpackSourcePaths: true
         },
         singleRun: watchTest ? false : true,

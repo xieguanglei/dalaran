@@ -30,8 +30,10 @@ function getKarmaConfig({
         {
             test: e => {
                 if (cvp !== 0) {
-                    process.stdout.clearLine();
-                    process.stdout.cursorTo(0);
+                    if (process.stdout.clearLine) {
+                        process.stdout.clearLine();
+                        process.stdout.cursorTo(0);
+                    }
                 }
                 cvp++;
                 process.stdout.write(`Process coverage ${cvp}/?.`);
